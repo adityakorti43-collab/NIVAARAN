@@ -11,3 +11,5 @@ frontend/playwright-report/
 .env.*
 !.env.example
 frontend/video/
+
+frontend/tsconfig.tsbuildinfo

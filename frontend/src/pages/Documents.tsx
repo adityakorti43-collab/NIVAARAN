@@ -21,8 +21,8 @@ const CATEGORY_TONE: Record<string, string> = {
 };
 
 function Uploader() {
-  const { refresh, documents } = useApp();
-  const [docType, setDocType] = useState<"policy" | "endorsement" | "benefit_summary">(documents.some((d) => d.doc_type === "policy") ? "endorsement" : "policy");
+  const { refresh } = useApp();
+  const [docType, setDocType] = useState<"policy" | "endorsement" | "benefit_summary">("policy");
   const [progress, setProgress] = useState<number | null>(null);
   const [phase, setPhase] = useState<string>("");
   const [err, setErr] = useState<string | null>(null);
@@ -196,7 +196,23 @@ export default function Documents() {
                         <p className="truncate text-sm font-medium text-text">{d.metadata.title ?? d.filename}</p>
                         <p className="mt-0.5 text-xs text-muted">{d.filename} · {d.page_count} pages · {d.clause_count} clauses</p>
                         <div className="mt-1.5 flex flex-wrap gap-1.5">
-                          <Tag tone={d.doc_type === "policy" ? "neutral" : "partial"}>{d.doc_type === "policy" ? "Policy" : "Endorsement"}</Tag>
+                          <Tag
+  tone={
+    d.doc_type === "policy"
+      ? "neutral"
+      : d.doc_type === "endorsement"
+        ? "partial"
+        : "conditional"
+  }
+>
+  {d.doc_type === "policy"
+    ? "Policy"
+    : d.doc_type === "endorsement"
+      ? "Endorsement"
+      : d.doc_type === "benefit_summary"
+        ? "Benefits Brochure"
+        : d.doc_type}
+</Tag>
                           <Tag tone={d.status === "processed" ? "covered" : d.status === "failed" ? "excluded" : "conditional"}>{d.status.replaceAll("_", " ")}</Tag>
                           {d.synthetic && <Tag tone="conditional">Synthetic</Tag>}
                           <Tag>Effective {d.metadata.effective_date}</Tag>
