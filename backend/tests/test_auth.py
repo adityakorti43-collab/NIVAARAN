@@ -49,9 +49,35 @@ def test_failed_logins_are_rate_limited():
 
 def test_password_never_stored_in_plaintext():
     from app import store
-    _, email = new_user()
+    c, email = new_user()
     pw_hash = store.query("SELECT pw_hash FROM users WHERE email=?", (email,))[0][0]
-    assert PW not in pw_hash and pw_hash.startswith("scrypt$")
+    assert PW not in pw_hash and pw_hash.startswith(("scrypt$", "pbkdf2_sha256$"))
+    assert c.get("/api/auth/me").json()["user"]["has_password"] is True
+
+
+def test_fallback_password_hash_is_portable(monkeypatch):
+    import hashlib
+    from app import auth
+
+    scrypt = getattr(hashlib, "scrypt", None)
+    monkeypatch.delattr(hashlib, "scrypt", raising=False)
+    stored = auth.hash_password(PW)
+    assert stored.startswith("pbkdf2_sha256$")
+    if scrypt:
+        monkeypatch.setattr(hashlib, "scrypt", scrypt)
+    assert auth.verify_password(PW, stored)
+    assert not auth.verify_password("wrong-password-1", stored)
+
+
+def test_legacy_mislabeled_fallback_hash_still_verifies():
+    import hashlib
+    from app import auth
+
+    salt = b"legacy-test-salt"
+    derived = hashlib.pbkdf2_hmac("sha256", PW.encode(), salt, 100_000, dklen=32)
+    stored = f"scrypt$16384$8$1${salt.hex()}${derived.hex()}"
+    assert auth.verify_password(PW, stored)
+    assert not auth.verify_password("wrong-password-1", stored)
 
 
 def test_password_reset_flow_via_outbox():

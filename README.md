@@ -77,7 +77,8 @@ local data (all accounts), stop the API and delete `backend/data/runtime/`; it i
 ## Accounts, data and AI configuration
 
 - **Accounts:** register, sign in, sign out, profile, change password, delete account, password reset (single-use tokens,
-  30-minute expiry). Passwords are stored as salted scrypt hashes. Sessions are 256-bit random tokens in an HttpOnly,
+  30-minute expiry). Passwords use salted scrypt hashes, with an explicitly labelled PBKDF2-HMAC-SHA256 fallback on platforms
+  where scrypt is unavailable. Sessions are 256-bit random tokens in an HttpOnly,
   SameSite=Lax cookie, stored server-side and expiring after `NIVAARAN_SESSION_DAYS` (default 7). Failed logins are rate-limited.
 - **Sign in with Google, Apple or a phone number** (in addition to email and password). Google and Apple use the server-side
   OAuth authorization-code flow with a single-use, hashed `state`; the ID token is read from the provider's token endpoint and its
@@ -309,7 +310,7 @@ Put it behind an HTTPS reverse proxy. See "Before a production deployment" below
 - Stored files use random IDs; user filenames are sanitised; internal paths are never returned by the API.
 - Document text is never logged. No document is sent to an external service unless the operator enables the optional
   Claude rewording, in which case the question, the cited excerpts and the deterministic answer are sent to the Anthropic API.
-- Passwords hashed (scrypt); HttpOnly session cookies; server-side authorisation on every data endpoint; secrets only via
+- Passwords hashed (scrypt, or PBKDF2-HMAC-SHA256 fallback when unavailable); HttpOnly session cookies; server-side authorisation on every data endpoint; secrets only via
   environment variables, never sent to the browser.
 
 **Before a production deployment (not done):** HTTPS with `NIVAARAN_COOKIE_SECURE=1`; CSRF tokens for state-changing requests

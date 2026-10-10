@@ -1,6 +1,6 @@
 """Accounts and sessions.
 
-- Passwords: scrypt (stdlib hashlib) with a per-user random salt; only the hash is stored.
+- Passwords: scrypt (stdlib hashlib), with PBKDF2-SHA256 as a portable fallback; only salted hashes are stored.
 - Sessions: 256-bit random tokens in an HttpOnly, SameSite=Lax cookie; the database stores only SHA-256 of the
   token, so a database leak does not reveal live sessions. Server-side expiry; logout deletes the session.
 - Password reset: single-use tokens (hashed at rest) that expire after 30 minutes. Email delivery is not
@@ -30,6 +30,7 @@ COOKIE = "nivaaran_session"
 SESSION_DAYS = int(os.environ.get("NIVAARAN_SESSION_DAYS", "7"))
 COOKIE_SECURE = os.environ.get("NIVAARAN_COOKIE_SECURE", "0") == "1"  # set to 1 behind HTTPS
 OUTBOX = DATA_DIR / "outbox"
+PBKDF2_ITERATIONS = 600_000
 EMAIL_RE = re.compile(r"^[^@\s]{1,64}@[^@\s]{1,190}\.[A-Za-z]{2,24}$")
 _fails: dict[str, list[float]] = {}
 
@@ -49,17 +50,60 @@ def _now() -> datetime:
     return datetime.now(timezone.utc)
 
 
+def _fallback_derived_key(pw: str, salt: bytes, iterations: int, dklen: int) -> bytes:
+    return hashlib.pbkdf2_hmac("sha256", pw.encode(), salt, iterations, dklen=dklen)
+
+
+def _legacy_fallback_iterations(n: int, r: int, p: int) -> int:
+    return max(100_000, (n * r * p) // 2)
+
+
 def hash_password(pw: str) -> str:
     salt = secrets.token_bytes(16)
-    dk = hashlib.scrypt(pw.encode(), salt=salt, n=2 ** 14, r=8, p=1, dklen=32)
-    return f"scrypt$16384$8$1${salt.hex()}${dk.hex()}"
+    scrypt = getattr(hashlib, "scrypt", None)
+    if callable(scrypt):
+        try:
+            dk = scrypt(pw.encode(), salt=salt, n=2 ** 14, r=8, p=1, dklen=32)
+            return f"scrypt$16384$8$1${salt.hex()}${dk.hex()}"
+        except (TypeError, ValueError):
+            pass
+    dk = _fallback_derived_key(pw, salt, PBKDF2_ITERATIONS, 32)
+    return f"pbkdf2_sha256${PBKDF2_ITERATIONS}${salt.hex()}${dk.hex()}"
 
 
 def verify_password(pw: str, stored: str) -> bool:
     try:
-        _, n, r, p, salt, dk = stored.split("$")
-        got = hashlib.scrypt(pw.encode(), salt=bytes.fromhex(salt), n=int(n), r=int(r), p=int(p), dklen=len(bytes.fromhex(dk)))
-        return hmac.compare_digest(got.hex(), dk)
+        parts = stored.split("$")
+        if len(parts) == 4 and parts[0] == "pbkdf2_sha256":
+            iterations = int(parts[1])
+            if not 100_000 <= iterations <= 10_000_000:
+                return False
+            salt, expected = bytes.fromhex(parts[2]), bytes.fromhex(parts[3])
+            got = _fallback_derived_key(pw, salt, iterations, len(expected))
+            return hmac.compare_digest(got, expected)
+
+        if len(parts) != 6 or parts[0] != "scrypt":
+            return False
+        _, n_raw, r_raw, p_raw, salt_raw, expected_raw = parts
+        n, r, p = int(n_raw), int(r_raw), int(p_raw)
+        if not 2 ** 10 <= n <= 2 ** 20 or n & (n - 1) or not 1 <= r <= 32 or not 1 <= p <= 16:
+            return False
+        salt, expected = bytes.fromhex(salt_raw), bytes.fromhex(expected_raw)
+        scrypt = getattr(hashlib, "scrypt", None)
+        if callable(scrypt):
+            try:
+                got = scrypt(pw.encode(), salt=salt, n=n, r=r, p=p, dklen=len(expected))
+                if hmac.compare_digest(got, expected):
+                    return True
+            except (TypeError, ValueError):
+                pass
+
+        # Earlier builds stored PBKDF2 fallback hashes with a scrypt prefix.
+        iterations = _legacy_fallback_iterations(n, r, p)
+        if iterations > 10_000_000:
+            return False
+        got = _fallback_derived_key(pw, salt, iterations, len(expected))
+        return hmac.compare_digest(got, expected)
     except (ValueError, TypeError):
         return False
 
@@ -76,8 +120,9 @@ USER_COLS = "id, email, name, created, is_demo, phone, provider, pw_hash"
 def _row_to_user(r) -> User:
     """r = (id, email, name, created, is_demo, phone, provider, pw_hash)."""
     pw = r[7] or ""
+    has_password = pw.startswith(("scrypt$", "pbkdf2_sha256$"))
     return User(id=r[0], email=r[1], name=r[2], created=r[3], is_demo=bool(r[4]), phone=r[5],
-                provider="demo" if r[4] else (r[6] or "password"), has_password=pw.startswith("scrypt$"))
+                provider="demo" if r[4] else (r[6] or "password"), has_password=has_password)
 
 
 def unusable_password() -> str:
