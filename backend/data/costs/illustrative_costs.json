@@ -1,0 +1,58 @@
+{
+  "dataset": {
+    "name": "Nivaaran illustrative treatment-cost table",
+    "data_type": "illustrative_synthetic",
+    "source": "Authored by the Nivaaran team for demonstration. NOT collected from hospitals, insurers or any price survey.",
+    "collection_date": "Not applicable (synthetic, authored 2026-10-10)",
+    "currency": "INR",
+    "units": "Total package cost per admission (INR); component shares are fractions of the total",
+    "geographic_coverage": "Hypothetical city tiers (Tier 1 / Tier 2 / Tier 3); no real geography is represented",
+    "limitations": [
+      "Values are invented to demonstrate the workflow and must not be used as market prices.",
+      "Real costs vary by hospital, city, room category, clinical complexity and length of stay.",
+      "Use 'Enter your own amounts' to analyse an actual quotation or bill."
+    ]
+  },
+  "hospital_types": {
+    "private": {"label": "Private hospital (illustrative)", "multiplier": "1.00"},
+    "trust": {"label": "Charitable/trust hospital (illustrative)", "multiplier": "0.70"},
+    "public": {"label": "Public hospital (illustrative)", "multiplier": "0.35"}
+  },
+  "procedures": [
+    {
+      "key": "lap_appendicectomy", "name": "Laparoscopic appendicectomy", "typical_room_days": 2, "typical_icu_days": 0,
+      "tiers": {"tier1": ["95000", "125000", "160000"], "tier2": ["75000", "98000", "125000"], "tier3": ["55000", "72000", "95000"]},
+      "components": [
+        ["Room Charges", "0.15"], ["Surgeon Fee", "0.34"], ["Anaesthetist Fee", "0.09"], ["OT Charges", "0.14"],
+        ["Laboratory investigations", "0.05"], ["Ultrasonography", "0.03"], ["Medicines and drugs", "0.10"],
+        ["Disposable gloves, masks and syringes", "0.04"], ["Admission kit and toiletries", "0.01"], ["Road ambulance", "0.05"]
+      ]
+    },
+    {
+      "key": "lap_cholecystectomy", "name": "Laparoscopic cholecystectomy", "typical_room_days": 3, "typical_icu_days": 0,
+      "tiers": {"tier1": ["120000", "160000", "210000"], "tier2": ["95000", "125000", "165000"], "tier3": ["70000", "92000", "120000"]},
+      "components": [
+        ["Room Charges", "0.17"], ["Surgeon Fee", "0.32"], ["Anaesthetist Fee", "0.09"], ["OT Charges", "0.14"],
+        ["Laboratory investigations", "0.06"], ["Ultrasonography", "0.03"], ["Medicines and drugs", "0.11"],
+        ["Disposable gloves, masks and syringes", "0.05"], ["Admission kit and toiletries", "0.01"], ["Road ambulance", "0.02"]
+      ]
+    },
+    {
+      "key": "cataract_one_eye", "name": "Cataract surgery (one eye, day care)", "typical_room_days": 1, "typical_icu_days": 0,
+      "tiers": {"tier1": ["35000", "55000", "85000"], "tier2": ["28000", "42000", "65000"], "tier3": ["20000", "32000", "48000"]},
+      "components": [
+        ["Cataract surgery", "0.70"], ["Room Charges", "0.08"], ["Laboratory investigations", "0.05"],
+        ["Medicines and drugs", "0.10"], ["Disposable gloves, masks and syringes", "0.07"]
+      ]
+    },
+    {
+      "key": "pneumonia_medical", "name": "Pneumonia — medical management (5 days)", "typical_room_days": 4, "typical_icu_days": 1,
+      "tiers": {"tier1": ["90000", "130000", "190000"], "tier2": ["70000", "100000", "145000"], "tier3": ["50000", "72000", "105000"]},
+      "components": [
+        ["Room Charges", "0.26"], ["ICU Charges", "0.16"], ["Consulting doctor visits", "0.10"], ["Laboratory investigations", "0.09"],
+        ["X-ray chest", "0.03"], ["Medicines and drugs", "0.24"], ["Nebulization", "0.04"], ["Disposable gloves, masks and syringes", "0.05"],
+        ["Multivitamin infusion", "0.03"]
+      ]
+    }
+  ]
+}

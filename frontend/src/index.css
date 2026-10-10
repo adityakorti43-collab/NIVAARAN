@@ -1,0 +1,231 @@
+@import "tailwindcss";
+/* Tone classes built dynamically (e.g. `text-${tone}`) must be generated explicitly. */
+@source inline("{bg,text}-{covered,partial,excluded,conditional,insufficient,conflict,review,accent}");
+
+/* ------------------------------------------------------------------
+   Nivaaran — Midnight forest × warm ivory × antique brass
+   The application sits on warm ivory paper with ink type. Deep forest
+   is the brand surface (landing hero, sidebar, bands): wrap any element
+   in `.theme-forest` and every token below re-resolves for dark.
+   Brass is the only ornament: rules, markers, focus and highlights.
+   Type: Instrument Serif for headlines, Instrument Sans for the
+   interface, IBM Plex Mono for clause numbers and technical labels.
+   ------------------------------------------------------------------ */
+@theme {
+  --font-sans: "Instrument Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Instrument Serif", "Iowan Old Style", Georgia, "Times New Roman", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+
+  /* brand constants */
+  --color-forest: #142d27;
+  --color-forest-2: #0e211c;
+  --color-ivory: #f5f2ea;
+  --color-brass: #b69a62;
+  --color-sage: #a9b8a5;
+  --color-inkblack: #222521;
+  --color-paperwhite: #fffefa;
+
+  /* semantic tokens (light / ivory by default) */
+  --color-void: #0b1714;
+  --color-field: #0e211c;
+  --color-field-2: #142d27;
+  --color-paper: #f5f2ea;       /* canvas */
+  --color-card: #fffefa;        /* paper white surfaces */
+  --color-card-2: #faf7f0;
+  --color-line: #e3ddcf;
+  --color-line-2: #d3cab6;
+  --color-text: #3b3e38;
+  --color-muted: #6c7068;
+  --color-faint: #989a90;
+  --color-ink: #222521;         /* headings & strong text */
+  --color-ink-2: #142d27;       /* sidebar / forest bands */
+  --color-ink-3: #1c3a32;
+
+  --color-accent: #1f5a4a;      /* forest, readable on ivory */
+  --color-accent-deep: #142d27;
+  --color-ice: #a9b8a5;
+  --color-amber: #9a6d22;
+  --color-btn: #142d27;
+  --color-btn-hover: #1e3f36;
+  --color-btn-ink: #f5f2ea;
+
+  --color-covered: #2e6b50;
+  --color-covered-bg: color-mix(in oklab, #2e6b50 10%, transparent);
+  --color-partial: #3c5e7f;
+  --color-partial-bg: color-mix(in oklab, #3c5e7f 10%, transparent);
+  --color-conditional: #946617;
+  --color-conditional-bg: color-mix(in oklab, #b88a34 14%, transparent);
+  --color-excluded: #a2463a;
+  --color-excluded-bg: color-mix(in oklab, #a2463a 10%, transparent);
+  --color-conflict: #7a4e86;
+  --color-conflict-bg: color-mix(in oklab, #7a4e86 10%, transparent);
+  --color-insufficient: #73786f;
+  --color-insufficient-bg: color-mix(in oklab, #73786f 10%, transparent);
+  --color-review: #8a6f22;
+  --color-review-bg: color-mix(in oklab, #b69a62 16%, transparent);
+
+  /* squarer, architectural corners everywhere (pills and dots stay round) */
+  --radius-xs: 2px;
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --radius-xl: 5px;
+  --radius-2xl: 6px;
+  --radius-3xl: 8px;
+
+  --shadow-lift: 0 1px 0 rgb(255 255 255 / 0.7) inset, 0 1px 2px rgb(34 37 33 / 0.04), 0 14px 30px -24px rgb(34 37 33 / 0.28);
+  --shadow-float: 0 1px 0 rgb(255 255 255 / 0.7) inset, 0 30px 60px -30px rgb(20 45 39 / 0.38);
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  @keyframes shimmer { from { background-position: -400px 0; } to { background-position: 400px 0; } }
+}
+
+/* Midnight forest scope: the same tokens, resolved for dark surfaces. */
+.theme-forest {
+  --color-paper: #0f251f;
+  --color-card: #163129;
+  --color-card-2: #1a382f;
+  --color-line: rgb(245 242 234 / 0.1);
+  --color-line-2: rgb(245 242 234 / 0.18);
+  --color-text: #e3dfd3;
+  --color-muted: #a9b8a5;
+  --color-faint: #7d8d80;
+  --color-ink: #f5f2ea;
+  --color-accent: #cdb27a;
+  --color-amber: #d8b46c;
+  --color-btn: #f5f2ea;
+  --color-btn-hover: #fffefa;
+  --color-btn-ink: #142d27;
+  --color-covered: #93c6a8;
+  --color-covered-bg: color-mix(in oklab, #93c6a8 13%, transparent);
+  --color-partial: #9cb8d4;
+  --color-partial-bg: color-mix(in oklab, #9cb8d4 13%, transparent);
+  --color-conditional: #dcb66e;
+  --color-conditional-bg: color-mix(in oklab, #dcb66e 14%, transparent);
+  --color-excluded: #e39d8d;
+  --color-excluded-bg: color-mix(in oklab, #e39d8d 13%, transparent);
+  --color-conflict: #cfa8dc;
+  --color-conflict-bg: color-mix(in oklab, #cfa8dc 13%, transparent);
+  --color-insufficient: #aab3a7;
+  --color-insufficient-bg: color-mix(in oklab, #aab3a7 12%, transparent);
+  --color-review: #dcc47c;
+  --color-review-bg: color-mix(in oklab, #dcc47c 13%, transparent);
+  --shadow-lift: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 20px 40px -28px rgb(0 0 0 / 0.8);
+  --shadow-float: 0 1px 0 rgb(255 255 255 / 0.05) inset, 0 40px 80px -30px rgb(0 0 0 / 0.9);
+  color: var(--color-text);
+  color-scheme: dark;
+}
+
+@layer base {
+  html { color-scheme: light; background: #f5f2ea; }
+  body { @apply bg-paper text-text font-sans antialiased; font-feature-settings: "ss01", "cv11"; }
+  ::selection { background: #b69a62; color: #142d27; }
+  :focus-visible { outline: 2px solid var(--color-brass); outline-offset: 2px; border-radius: 3px; }
+  .num { font-variant-numeric: tabular-nums; }
+  input[type="checkbox"] { accent-color: #142d27; }
+  select option { background: #fffefa; color: #222521; }
+  .theme-forest select option { background: #142d27; color: #f5f2ea; }
+  .theme-forest input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.85); }
+  * { scrollbar-width: thin; scrollbar-color: #cfc6b2 transparent; }
+  .theme-forest * { scrollbar-color: rgb(245 242 234 / 0.2) transparent; }
+  /* Instrument Serif ships one weight: never let the browser fake a bold */
+  .font-display, .h-display { font-weight: 400 !important; font-synthesis: none; }
+}
+
+@utility card { @apply rounded-lg border border-line bg-card; box-shadow: var(--shadow-lift); }
+@utility card-raised { @apply rounded-xl border border-line bg-card; box-shadow: var(--shadow-float); }
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-[3px] px-4 py-2 text-[13.5px] font-medium tracking-[0.005em] transition-[background,color,box-shadow,transform,border-color] duration-200 active:scale-[0.98] disabled:opacity-45 disabled:cursor-not-allowed disabled:active:scale-100;
+}
+@utility btn-primary {
+  @apply btn;
+  background: var(--color-btn); color: var(--color-btn-ink);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 1px 2px rgb(20 45 39 / 0.25);
+  &:hover:not(:disabled) { background: var(--color-btn-hover); }
+}
+@utility btn-secondary { @apply btn border border-line-2 bg-transparent text-ink hover:border-ink/45 hover:bg-ink/[0.03]; }
+@utility btn-ghost { @apply btn font-medium text-muted hover:text-ink hover:bg-ink/[0.05]; }
+@utility btn-brass { @apply btn bg-brass text-forest hover:bg-[#c4a96f]; }
+@utility input {
+  @apply w-full rounded-[3px] border border-line-2 bg-card px-3 py-2 text-sm text-ink placeholder:text-faint transition-colors focus:outline-none focus:ring-4 focus:ring-brass/20 focus:border-brass disabled:opacity-50;
+}
+@utility label { @apply block text-[12px] font-medium text-muted mb-1.5; }
+@utility eyebrow { @apply font-mono text-[10.5px] font-medium uppercase tracking-[0.16em] text-muted; }
+@utility h-display { @apply font-display text-ink; letter-spacing: -0.012em; }
+@utility chip-on { @apply bg-ink text-paper; }
+@utility seg { @apply flex rounded-full border border-line-2 bg-card p-0.5; }
+@utility rule-brass { background: linear-gradient(90deg, var(--color-brass), transparent); height: 1px; }
+@utility skeleton {
+  @apply rounded-lg;
+  background: linear-gradient(90deg, color-mix(in oklab, var(--color-ink) 4%, transparent) 0px, color-mix(in oklab, var(--color-ink) 9%, transparent) 160px, color-mix(in oklab, var(--color-ink) 4%, transparent) 320px);
+  background-size: 800px 100%;
+  animation: var(--animate-shimmer);
+}
+@utility text-gradient { color: var(--color-ink); }
+@utility glow-green { box-shadow: 0 0 0 1px rgb(182 154 98 / 0.4); }
+
+/* Faint drafting grid behind the workspace */
+.ambient { background-image: linear-gradient(rgb(34 37 33 / 0.028) 1px, transparent 1px), linear-gradient(90deg, rgb(34 37 33 / 0.028) 1px, transparent 1px); background-size: 40px 40px; }
+.grid-fade {
+  background-image: linear-gradient(rgb(245 242 234 / 0.05) 1px, transparent 1px), linear-gradient(90deg, rgb(245 242 234 / 0.05) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse at 50% 40%, black 15%, transparent 72%);
+}
+/* Fine paper grain for ivory editorial sections */
+.paper-grain { background-image: radial-gradient(rgb(34 37 33 / 0.035) 0.6px, transparent 0.6px); background-size: 3px 3px; }
+/* Perforated receipt edge */
+.perforated { mask: radial-gradient(circle 5px at 50% 0, transparent 98%, black) top/16px 51% repeat-x, radial-gradient(circle 5px at 50% 100%, transparent 98%, black) bottom/16px 51% repeat-x; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+.react-flow__attribution { display: none; }
+.react-flow__controls { box-shadow: none !important; border: 1px solid var(--color-line-2); border-radius: 4px; overflow: hidden; }
+.react-flow__controls-button { background: var(--color-card) !important; border-bottom: 1px solid var(--color-line) !important; fill: var(--color-text) !important; }
+.react-flow__edge-textbg { fill: var(--color-card); }
+.recharts-default-tooltip { background: var(--color-card) !important; border-radius: 4px !important; border: 1px solid var(--color-line-2) !important; color: var(--color-text); }
+.recharts-legend-item-text { color: var(--color-muted) !important; }
+
+/* ---- Global 3D interaction layer (driven by lib/fx.ts) ---- */
+.btn, .btn-primary, .btn-secondary, .btn-ghost, .btn-brass, [data-fx-btn] { position: relative; overflow: hidden; transform-style: preserve-3d; transition: transform .25s var(--ease-out-soft), background .2s, color .2s, box-shadow .25s, border-color .2s; will-change: transform; }
+[data-fx-on].btn-primary, [data-fx-on].btn, [data-fx-on].btn-secondary, [data-fx-on].btn-brass { box-shadow: 0 16px 30px -16px rgb(20 45 39 / .55), 0 0 0 1px rgb(182 154 98 / .35); }
+[data-fx-on].btn-primary::before, [data-fx-on].btn-secondary::before, [data-fx-on].btn::before, [data-fx-on].btn-brass::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  background: radial-gradient(110px circle at var(--fx-x) var(--fx-y), rgb(255 255 255 / .2), transparent 60%); mix-blend-mode: overlay;
+}
+.fx-ripple { position: absolute; border-radius: 9999px; pointer-events: none; background: rgb(182 154 98 / .3); transform: scale(0); animation: fx-ripple .65s var(--ease-out-soft) forwards; }
+@keyframes fx-ripple { to { transform: scale(1); opacity: 0; } }
+.card, .card-raised { transition: transform .35s var(--ease-out-soft), border-color .25s, box-shadow .35s; transform-style: preserve-3d; }
+.card[data-fx-on], .card-raised[data-fx-on] { border-color: var(--color-line-2); box-shadow: 0 28px 50px -32px rgb(20 45 39 / .45);
+  background-image: radial-gradient(500px circle at var(--fx-x) var(--fx-y), color-mix(in oklab, var(--color-brass) 7%, transparent), transparent 55%); }
+
+/* ---- Landing: hero glow and the prompt box ---- */
+.aurora {
+  background:
+    radial-gradient(55% 70% at 22% 105%, rgba(182, 154, 98, 0.2), transparent 70%),
+    radial-gradient(45% 60% at 72% 110%, rgba(169, 184, 165, 0.12), transparent 70%);
+  filter: blur(40px);
+  animation: aurora-drift 14s ease-in-out infinite alternate;
+}
+@keyframes aurora-drift {
+  0% { transform: translate3d(-3%, 4%, 0) scale(1); opacity: 0.85; }
+  100% { transform: translate3d(3%, 0, 0) scale(1.08); opacity: 1; }
+}
+.askbox {
+  position: relative;
+  border-radius: 4px;
+  background: rgb(14 33 28 / 0.72);
+  border: 1px solid rgb(245 242 234 / 0.14);
+  box-shadow: 0 24px 60px -24px rgb(0 0 0 / 0.7);
+  backdrop-filter: blur(14px);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.askbox:focus-within { border-color: rgb(182 154 98 / 0.7); box-shadow: 0 24px 60px -24px rgb(0 0 0 / 0.7), 0 0 0 4px rgb(182 154 98 / 0.12); }
+.ws-progress { animation: ws-grow 3.2s ease-in-out infinite; }
+@keyframes ws-grow { 0% { width: 4%; } 70% { width: 100%; } 100% { width: 100%; opacity: 0.4; } }
+@media (prefers-reduced-motion: reduce) {
+  .aurora, .ws-progress { animation: none; }
+  .ws-progress { width: 70%; }
+}

@@ -1,0 +1,169 @@
+{
+  // Nivaaran — open this file in VS Code (File → Open Workspace from File…).
+  // First time: Terminal → Run Task… → "Setup: everything". Then Run and Debug (Ctrl+Shift+D) → "Nivaaran: full stack" → F5.
+  "folders": [{ "name": "nivaaran", "path": "." }],
+
+  "settings": {
+    "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/Scripts/python.exe",
+    "python.analysis.extraPaths": ["${workspaceFolder}/backend"],
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "python.testing.cwd": "${workspaceFolder}/backend",
+    "python.testing.pytestArgs": ["tests", "-q"],
+    "typescript.tsdk": "frontend/node_modules/typescript/lib",
+    "editor.formatOnSave": false,
+    "files.eol": "\n",
+    "files.exclude": {
+      "**/__pycache__": true,
+      "**/.pytest_cache": true,
+      "frontend/node_modules": true,
+      "frontend/dist": true,
+      "frontend/test-results": true
+    },
+    "search.exclude": { "backend/.venv": true, "frontend/node_modules": true, "frontend/dist": true },
+    "tailwindCSS.experimental.configFile": "frontend/src/index.css",
+    // Tasks chain commands with ";" on Windows, which needs PowerShell rather than cmd.exe.
+    "terminal.integrated.automationProfile.windows": { "path": "powershell.exe" }
+  },
+
+  "extensions": {
+    "recommendations": [
+      "ms-python.python",
+      "ms-python.debugpy",
+      "ms-playwright.playwright",
+      "bradlc.vscode-tailwindcss",
+      "dbaeumer.vscode-eslint"
+    ]
+  },
+
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "API (FastAPI, debug)",
+        "type": "debugpy",
+        "request": "launch",
+        "module": "uvicorn",
+        "args": ["app.main:app", "--host", "127.0.0.1", "--port", "8000", "--reload"],
+        "cwd": "${workspaceFolder}/backend",
+        "python": "${workspaceFolder}/backend/.venv/Scripts/python.exe",
+        "linux": { "python": "${workspaceFolder}/backend/.venv/bin/python" },
+        "osx": { "python": "${workspaceFolder}/backend/.venv/bin/python" },
+        // Local development only: shows phone sign-in codes on screen because no SMS provider is configured.
+        "env": { "NIVAARAN_DEV_OTP": "1" },
+        "justMyCode": true,
+        "console": "integratedTerminal"
+      },
+      {
+        "name": "Web (Vite dev server)",
+        "type": "node-terminal",
+        "request": "launch",
+        "command": "npm run dev",
+        "cwd": "${workspaceFolder}/frontend"
+      },
+      {
+        "name": "Open in Chrome",
+        "type": "chrome",
+        "request": "launch",
+        "url": "http://localhost:5173",
+        "webRoot": "${workspaceFolder}/frontend/src"
+      },
+      {
+        "name": "Backend tests (pytest, debug)",
+        "type": "debugpy",
+        "request": "launch",
+        "module": "pytest",
+        "args": ["tests", "-q"],
+        "cwd": "${workspaceFolder}/backend",
+        "python": "${workspaceFolder}/backend/.venv/Scripts/python.exe",
+        "linux": { "python": "${workspaceFolder}/backend/.venv/bin/python" },
+        "osx": { "python": "${workspaceFolder}/backend/.venv/bin/python" },
+        "console": "integratedTerminal"
+      }
+    ],
+    "compounds": [
+      {
+        "name": "Nivaaran: full stack",
+        "configurations": ["API (FastAPI, debug)", "Web (Vite dev server)", "Open in Chrome"],
+        "stopAll": true
+      }
+    ]
+  },
+
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Setup: backend (venv + Python packages)",
+        "type": "shell",
+        "options": { "cwd": "${workspaceFolder}/backend" },
+        "windows": { "command": "python -m venv .venv; .\\.venv\\Scripts\\python.exe -m pip install --upgrade pip; .\\.venv\\Scripts\\python.exe -m pip install -r requirements.txt" },
+        "linux": { "command": "python3 -m venv .venv && .venv/bin/python -m pip install --upgrade pip && .venv/bin/python -m pip install -r requirements.txt" },
+        "osx": { "command": "python3 -m venv .venv && .venv/bin/python -m pip install --upgrade pip && .venv/bin/python -m pip install -r requirements.txt" },
+        "problemMatcher": []
+      },
+      {
+        "label": "Setup: frontend (npm packages)",
+        "type": "shell",
+        "command": "npm install",
+        "options": { "cwd": "${workspaceFolder}/frontend" },
+        "problemMatcher": []
+      },
+      {
+        "label": "Setup: everything",
+        "dependsOn": ["Setup: backend (venv + Python packages)", "Setup: frontend (npm packages)"],
+        "dependsOrder": "sequence",
+        "problemMatcher": []
+      },
+      {
+        "label": "Run: API",
+        "type": "shell",
+        "options": { "cwd": "${workspaceFolder}/backend", "env": { "NIVAARAN_DEV_OTP": "1" } },
+        "windows": { "command": ".\\.venv\\Scripts\\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload" },
+        "linux": { "command": ".venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload" },
+        "osx": { "command": ".venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload" },
+        "isBackground": true,
+        "problemMatcher": []
+      },
+      {
+        "label": "Run: web",
+        "type": "shell",
+        "command": "npm run dev",
+        "options": { "cwd": "${workspaceFolder}/frontend" },
+        "isBackground": true,
+        "problemMatcher": []
+      },
+      {
+        "label": "Run: API + web",
+        "dependsOn": ["Run: API", "Run: web"],
+        "problemMatcher": []
+      },
+      {
+        "label": "Test: backend (pytest)",
+        "type": "shell",
+        "options": { "cwd": "${workspaceFolder}/backend" },
+        "windows": { "command": ".\\.venv\\Scripts\\python.exe -m pytest -q" },
+        "linux": { "command": ".venv/bin/python -m pytest -q" },
+        "osx": { "command": ".venv/bin/python -m pytest -q" },
+        "group": "test",
+        "problemMatcher": []
+      },
+      {
+        "label": "Test: browser (Playwright)",
+        "type": "shell",
+        "command": "npx playwright test",
+        "options": { "cwd": "${workspaceFolder}/frontend" },
+        "group": "test",
+        "problemMatcher": []
+      },
+      {
+        "label": "Build: frontend (production)",
+        "type": "shell",
+        "command": "npm run build",
+        "options": { "cwd": "${workspaceFolder}/frontend" },
+        "group": "build",
+        "problemMatcher": ["$tsc"]
+      }
+    ]
+  }
+}

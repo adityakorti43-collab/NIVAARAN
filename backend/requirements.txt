@@ -1,0 +1,16 @@
+# Core (required)
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pydantic>=2.8
+pymupdf>=1.24
+scikit-learn>=1.5
+numpy>=1.26
+python-multipart>=0.0.9
+httpx>=0.27          # Google/Apple token exchange and SMS delivery
+
+# Semantic retrieval + reranker (recommended; without it Nivaaran uses a labelled LSA fallback).
+# For a smaller CPU-only install on Windows/Linux:  pip install torch --index-url https://download.pytorch.org/whl/cpu
+sentence-transformers>=3.0
+
+# Tests
+pytest>=8
