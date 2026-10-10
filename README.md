@@ -3,7 +3,7 @@
 **Insurance clarity. Backed by evidence.**
 
 Nivaaran is an AI-assisted health-insurance policy intelligence, treatment-cost analysis and itemised claim-adjudication
-support platform (hackathon problem **FIN-01 — Insurance Coverage and Treatment Cost Intelligence**).
+support platform (HackMatrix 5.0 problem **FIN-01 — Policy-to-Patient: Insurance Coverage & Treatment Cost Intelligence**).
 
 Upload a policy wording, its endorsements and an itemised hospital bill. Nivaaran selects the policy version that applies on
 the treatment date, matches every bill line to the clauses that govern it, verifies that evidence, and computes an itemised,
@@ -32,14 +32,14 @@ npm install
 npm run dev                                                                # http://localhost:5173
 ```
 
-Open http://localhost:5173 and click **Analyze a Claim**. Without an account this opens a private, disposable demo workspace
+Open http://localhost:5173 and click **Try the demo**. Without an account this opens a private, disposable demo workspace
 seeded with the synthetic case (deleted after 24 hours). No API keys or private credentials are needed.
 The first semantic search downloads `all-MiniLM-L6-v2` (~90 MB) and the reranker (~90 MB) from Hugging Face once; after that
 everything runs offline.
 
 ### Running the demo
 
-1. **Landing → Analyze a Claim** (or, when signed in, **Dashboard → Add the synthetic demo case**). This runs the real
+1. **Landing → Try the demo** (or, when signed in, **Dashboard → Add the synthetic demo case**). This runs the real
    pipeline: the synthetic policy PDF and bill PDF are ingested first, then endorsement E-01 is added, which records a
    before/after comparison. Every visitor gets an isolated copy, so the demo is repeatable and never shared.
 2. **Claim workspace** — expand ledger rows to see exact clause excerpts, pages, verification outcomes and per-item calculations.
@@ -54,6 +54,19 @@ everything runs offline.
    **Fraud & Fairness**, **Action Center**, **Cost intelligence**, **Evaluation** (click *Run evaluation*),
    **Reports** (PDF/JSON download; each generated report is listed on the dashboard).
 7. Sign out and back in, or reload: claims, analyses, scenarios, chats and reports are read back from the database.
+
+### Website navigation
+
+The workspace groups its tools by task:
+
+| Group | Pages | What they do |
+|---|---|---|
+| **Overview** | Dashboard | Overview of the signed-in workspace, claims, and recent activity. |
+| **Analyse** | Documents · Claim workspace · Evidence explorer | Upload policies, endorsements and benefit summaries; review a bill and its extracted lines; inspect the applicable version, itemized estimate, and supporting clauses. |
+| **Understand** | Claim map · Money flow · What-if calculator · Assistant | Explore links between charges and clauses, see how amounts change through the calculation, compare hypothetical changes, and ask evidence-grounded questions. |
+| **Act** | Mismatch checks · Next steps · Treatment costs · Evaluation · Reports | Review document inconsistencies, prepare questions for an insurer, explore explicitly illustrative treatment-cost ranges or enter amounts, run the synthetic evaluation, and download reports. |
+
+**Treatment costs is not live pricing.** Its built-in procedure ranges are authored illustrative data, not surveyed hospital prices. User-entered costs can be analyzed separately. The evaluation page also uses a small synthetic dataset and is not evidence of performance on real claims.
 
 **Demo reset:** the demo is seeded per visitor from `backend/demo/documents/` through the normal pipeline, so there is
 nothing shared to reset. To regenerate the synthetic PDFs run `python -m demo.generate_demo` from `backend/`. To wipe all
