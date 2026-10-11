@@ -1,0 +1,11 @@
+# Production server (Render). Uses the built-in lightweight search (NIVAARAN_EMBEDDINGS=lsa), so the large
+# sentence-transformers / PyTorch packages are not needed; requirements.txt is the full set for local development.
+# Pinned to the versions the test suite passes with.
+fastapi==0.143.0
+uvicorn[standard]==0.54.0
+pydantic==2.14.0
+pymupdf==1.28.2
+scikit-learn==1.9.1
+numpy==2.4.6
+python-multipart==0.0.32
+httpx==0.28.1

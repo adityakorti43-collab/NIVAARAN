@@ -1,0 +1,38 @@
+# Render Blueprint: Nivaaran's API server (database, uploads, document engine).
+# The website itself is on Vercel and forwards /api/* here (frontend/vercel.json).
+services:
+  - type: web
+    name: nivaaran-api
+    runtime: python
+    plan: starter            # 512 MB is enough with the lightweight search (about 170 MB in use)
+    region: singapore        # closest Render region to India
+    rootDir: backend
+    buildCommand: pip install -r requirements-server.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips "*"
+    healthCheckPath: /api/health
+    disk:
+      name: nivaaran-data
+      mountPath: /var/data   # accounts, documents and claims live here and survive restarts and deploys
+      sizeGB: 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: NIVAARAN_DATA_DIR
+        value: /var/data
+      - key: NIVAARAN_EMBEDDINGS
+        value: lsa
+      - key: NIVAARAN_RERANKER
+        value: "off"
+      - key: NIVAARAN_COOKIE_SECURE
+        value: "1"
+      # Set these in the Render dashboard (they are secrets or depend on your Vercel address):
+      - key: NIVAARAN_PUBLIC_URL          # e.g. https://nivaaran.vercel.app
+        sync: false
+      - key: NIVAARAN_CORS_ORIGINS        # same address as above
+        sync: false
+      - key: NIVAARAN_GOOGLE_CLIENT_ID
+        sync: false
+      - key: NIVAARAN_GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: NIVAARAN_GEMINI_API_KEY
+        sync: false

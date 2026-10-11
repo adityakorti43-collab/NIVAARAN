@@ -1,0 +1,79 @@
+{
+  "id": "/",
+  "name": "Nivaaran — Insurance clarity",
+  "short_name": "Nivaaran",
+  "description": "Check a hospital bill against your health insurance policy, line by line, with the exact clause behind every deduction.",
+  "start_url": "/dashboard?source=app",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#142d27",
+  "theme_color": "#142d27",
+  "lang": "en-IN",
+  "categories": [
+    "finance",
+    "health",
+    "productivity"
+  ],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "My documents",
+      "short_name": "Documents",
+      "url": "/documents?source=app",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Check a hospital bill",
+      "short_name": "Check a bill",
+      "url": "/claim?source=app",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Ask about my policy",
+      "short_name": "Ask",
+      "url": "/assistant?source=app",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

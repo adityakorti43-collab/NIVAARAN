@@ -1,0 +1,22 @@
+backend/.venv/
+backend/data/runtime/
+__pycache__/
+*.pyc
+.pytest_cache/
+frontend/node_modules/
+frontend/dist/
+frontend/test-results/
+frontend/playwright-report/
+.env
+.env.*
+!.env.example
+frontend/video/
+
+# Local-only files (never uploaded)
+.claude/
+extracted/
+*.zip
+*.apk
+*.aab
+frontend/icons/
+backend/.ruff_cache/

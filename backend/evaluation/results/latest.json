@@ -1,0 +1,3597 @@
+{
+  "generated_at": "2026-10-10T13:49:15+00:00",
+  "command": "cd backend && python -m app.evaluation.run_eval",
+  "runtime_seconds": 16.2,
+  "dataset": {
+    "file": "backend/evaluation/labeled_queries.json",
+    "synthetic": true,
+    "query_count": 60,
+    "labeled_items": 53,
+    "retrieval_queries": 54,
+    "clause_count": {
+      "v1": 31,
+      "v2": 32
+    },
+    "documents": [
+      "synthetic_policy_v1.pdf",
+      "synthetic_endorsement_E01.pdf"
+    ],
+    "label_distribution": {
+      "covered": 28,
+      "conditional": 5,
+      "excluded": 11,
+      "conflict": 2,
+      "insufficient": 7,
+      "retrieval_only": 7
+    },
+    "tag_distribution": {
+      "direct_keyword": 11,
+      "amendment": 4,
+      "paraphrase": 17,
+      "version_filter": 4,
+      "abbreviation": 10,
+      "synonym": 1,
+      "spelling_variant": 2,
+      "conditional": 6,
+      "override": 2,
+      "exclusion": 11,
+      "conflict": 2,
+      "missing_evidence": 6,
+      "no_definitive_answer": 2,
+      "similar_but_inapplicable": 4,
+      "time_window": 2,
+      "rule_lookup": 7
+    }
+  },
+  "split": {
+    "method": "Group-level random split: all paraphrases of a concept share a group and stay on the same side.",
+    "seed": 42,
+    "dev_fraction": 0.4,
+    "dev_queries": 23,
+    "eval_queries": 37,
+    "dev_groups": [
+      "cosmetic",
+      "doctor",
+      "implant",
+      "lab",
+      "medicine",
+      "missing3",
+      "non_medical",
+      "post_hosp",
+      "rule_ded",
+      "rule_room",
+      "vitamin"
+    ],
+    "eval_groups": [
+      "ambulance",
+      "anaesthesia",
+      "comfort",
+      "consumables_v1",
+      "consumables_v2",
+      "icu",
+      "imaging",
+      "missing",
+      "missing2",
+      "nebulizer",
+      "ot",
+      "room",
+      "rule_copay",
+      "rule_order",
+      "rule_preexisting",
+      "rule_wait",
+      "surgeon"
+    ]
+  },
+  "configuration": {
+    "keyword": "Okapi BM25 (k1=1.5, b=0.75), own implementation",
+    "semantic_backend": "sentence-transformers",
+    "semantic_model": "sentence-transformers/all-MiniLM-L6-v2",
+    "fusion": "Reciprocal rank fusion (c=60) of BM25 and semantic top-15",
+    "reranker": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+    "reranker_available": true,
+    "query_forms": {
+      "raw": "bill description exactly as written",
+      "normalized": "abbreviation expansion + category label from the Nivaaran lexicon"
+    },
+    "metadata_filter": "Each query searches only clauses active in its policy version (superseded clauses removed).",
+    "verification": "Production path: union of BM25 and semantic top-8 candidates -> clause-term verification -> decision rules.",
+    "python": "3.11.9"
+  },
+  "metric_definitions": {
+    "recall@k": "Mean over queries of |relevant \u2229 top-k| / |relevant|.",
+    "hit@k": "Share of queries with at least one relevant clause in the top k.",
+    "precision@3": "Mean of |relevant \u2229 top-3| / 3 (bounded above when a query has fewer than 3 relevant clauses).",
+    "mrr": "Mean reciprocal rank of the first relevant clause (0 if none in the top 10).",
+    "ndcg@5": "Graded nDCG with gains 2^rel - 1 (rel 2 = decisive, 1 = related).",
+    "accuracy": "Share of labeled bill items whose predicted evidence label equals the gold label."
+  },
+  "results": {
+    "eval": {
+      "retrieval": {
+        "bm25:raw": {
+          "queries": 33,
+          "recall@1": 0.6566,
+          "hit@1": 0.7879,
+          "recall@3": 0.8384,
+          "hit@3": 0.8485,
+          "recall@5": 0.8636,
+          "hit@5": 0.8788,
+          "precision@3": 0.3737,
+          "mrr": 0.8258,
+          "ndcg@5": 0.8217
+        },
+        "bm25:normalized": {
+          "queries": 33,
+          "recall@1": 0.798,
+          "hit@1": 0.9394,
+          "recall@3": 0.9798,
+          "hit@3": 1.0,
+          "recall@5": 0.9899,
+          "hit@5": 1.0,
+          "precision@3": 0.4343,
+          "mrr": 0.9697,
+          "ndcg@5": 0.9698
+        },
+        "semantic:raw": {
+          "queries": 33,
+          "recall@1": 0.7626,
+          "hit@1": 0.9091,
+          "recall@3": 0.8889,
+          "hit@3": 0.9697,
+          "recall@5": 0.9394,
+          "hit@5": 0.9697,
+          "precision@3": 0.3838,
+          "mrr": 0.9343,
+          "ndcg@5": 0.9015
+        },
+        "semantic:normalized": {
+          "queries": 33,
+          "recall@1": 0.8081,
+          "hit@1": 0.9697,
+          "recall@3": 0.9495,
+          "hit@3": 1.0,
+          "recall@5": 1.0,
+          "hit@5": 1.0,
+          "precision@3": 0.4141,
+          "mrr": 0.9848,
+          "ndcg@5": 0.9648
+        },
+        "hybrid:normalized": {
+          "queries": 33,
+          "recall@1": 0.8384,
+          "hit@1": 1.0,
+          "recall@3": 0.9747,
+          "hit@3": 1.0,
+          "recall@5": 1.0,
+          "hit@5": 1.0,
+          "precision@3": 0.4343,
+          "mrr": 1.0,
+          "ndcg@5": 0.9902
+        },
+        "hybrid_rerank:normalized": {
+          "queries": 33,
+          "recall@1": 0.8384,
+          "hit@1": 1.0,
+          "recall@3": 1.0,
+          "hit@3": 1.0,
+          "recall@5": 1.0,
+          "hit@5": 1.0,
+          "precision@3": 0.4545,
+          "mrr": 1.0,
+          "ndcg@5": 1.0
+        }
+      },
+      "verification": {
+        "items": 32,
+        "accuracy": 1.0,
+        "macro_f1": 1.0,
+        "per_label": {
+          "covered": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 19
+          },
+          "excluded": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 7
+          },
+          "conditional": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "conflict": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "insufficient": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 4
+          }
+        },
+        "exclusion_identification": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 7
+        },
+        "conflict_detection": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 2
+        },
+        "ambiguity_detection": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 6
+        },
+        "unsupported_answer_rate": 0.0,
+        "unsupported_answer_rate_definition": "Share of items whose correct answer is non-definitive (conditional, conflict or insufficient evidence) for which the system nevertheless returned covered/excluded.",
+        "confusion": [
+          {
+            "gold": "conflict",
+            "pred": "conflict",
+            "count": 2
+          },
+          {
+            "gold": "covered",
+            "pred": "covered",
+            "count": 19
+          },
+          {
+            "gold": "excluded",
+            "pred": "excluded",
+            "count": 7
+          },
+          {
+            "gold": "insufficient",
+            "pred": "insufficient",
+            "count": 4
+          }
+        ]
+      }
+    },
+    "dev": {
+      "retrieval": {
+        "bm25:raw": {
+          "queries": 21,
+          "recall@1": 0.5952,
+          "hit@1": 0.6667,
+          "recall@3": 0.6905,
+          "hit@3": 0.7143,
+          "recall@5": 0.6905,
+          "hit@5": 0.7143,
+          "precision@3": 0.2698,
+          "mrr": 0.6905,
+          "ndcg@5": 0.6884
+        },
+        "bm25:normalized": {
+          "queries": 21,
+          "recall@1": 0.8095,
+          "hit@1": 0.9048,
+          "recall@3": 0.9524,
+          "hit@3": 1.0,
+          "recall@5": 0.9524,
+          "hit@5": 1.0,
+          "precision@3": 0.3651,
+          "mrr": 0.9365,
+          "ndcg@5": 0.932
+        },
+        "semantic:raw": {
+          "queries": 21,
+          "recall@1": 0.5714,
+          "hit@1": 0.619,
+          "recall@3": 0.8095,
+          "hit@3": 0.8571,
+          "recall@5": 0.9762,
+          "hit@5": 1.0,
+          "precision@3": 0.3175,
+          "mrr": 0.7587,
+          "ndcg@5": 0.802
+        },
+        "semantic:normalized": {
+          "queries": 21,
+          "recall@1": 0.7619,
+          "hit@1": 0.8571,
+          "recall@3": 0.8571,
+          "hit@3": 0.8571,
+          "recall@5": 0.9048,
+          "hit@5": 0.9048,
+          "precision@3": 0.3492,
+          "mrr": 0.8803,
+          "ndcg@5": 0.8717
+        },
+        "hybrid:normalized": {
+          "queries": 21,
+          "recall@1": 0.7143,
+          "hit@1": 0.8095,
+          "recall@3": 1.0,
+          "hit@3": 1.0,
+          "recall@5": 1.0,
+          "hit@5": 1.0,
+          "precision@3": 0.3968,
+          "mrr": 0.9048,
+          "ndcg@5": 0.9259
+        },
+        "hybrid_rerank:normalized": {
+          "queries": 21,
+          "recall@1": 0.8095,
+          "hit@1": 0.9048,
+          "recall@3": 0.9524,
+          "hit@3": 0.9524,
+          "recall@5": 1.0,
+          "hit@5": 1.0,
+          "precision@3": 0.381,
+          "mrr": 0.9325,
+          "ndcg@5": 0.9491
+        }
+      },
+      "verification": {
+        "items": 21,
+        "accuracy": 1.0,
+        "macro_f1": 1.0,
+        "per_label": {
+          "covered": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 9
+          },
+          "excluded": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 4
+          },
+          "conditional": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 5
+          },
+          "conflict": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "insufficient": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 3
+          }
+        },
+        "exclusion_identification": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 4
+        },
+        "conflict_detection": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "ambiguity_detection": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 8
+        },
+        "unsupported_answer_rate": 0.0,
+        "unsupported_answer_rate_definition": "Share of items whose correct answer is non-definitive (conditional, conflict or insufficient evidence) for which the system nevertheless returned covered/excluded.",
+        "confusion": [
+          {
+            "gold": "conditional",
+            "pred": "conditional",
+            "count": 5
+          },
+          {
+            "gold": "covered",
+            "pred": "covered",
+            "count": 9
+          },
+          {
+            "gold": "excluded",
+            "pred": "excluded",
+            "count": 4
+          },
+          {
+            "gold": "insufficient",
+            "pred": "insufficient",
+            "count": 3
+          }
+        ]
+      }
+    },
+    "all": {
+      "retrieval": {
+        "bm25:raw": {
+          "queries": 54,
+          "recall@1": 0.6327,
+          "hit@1": 0.7407,
+          "recall@3": 0.7809,
+          "hit@3": 0.7963,
+          "recall@5": 0.7963,
+          "hit@5": 0.8148,
+          "precision@3": 0.3333,
+          "mrr": 0.7731,
+          "ndcg@5": 0.7699
+        },
+        "bm25:normalized": {
+          "queries": 54,
+          "recall@1": 0.8025,
+          "hit@1": 0.9259,
+          "recall@3": 0.9691,
+          "hit@3": 1.0,
+          "recall@5": 0.9753,
+          "hit@5": 1.0,
+          "precision@3": 0.4074,
+          "mrr": 0.9568,
+          "ndcg@5": 0.9551
+        },
+        "semantic:raw": {
+          "queries": 54,
+          "recall@1": 0.6883,
+          "hit@1": 0.7963,
+          "recall@3": 0.858,
+          "hit@3": 0.9259,
+          "recall@5": 0.9537,
+          "hit@5": 0.9815,
+          "precision@3": 0.358,
+          "mrr": 0.866,
+          "ndcg@5": 0.8628
+        },
+        "semantic:normalized": {
+          "queries": 54,
+          "recall@1": 0.7901,
+          "hit@1": 0.9259,
+          "recall@3": 0.9136,
+          "hit@3": 0.9444,
+          "recall@5": 0.963,
+          "hit@5": 0.963,
+          "precision@3": 0.3889,
+          "mrr": 0.9442,
+          "ndcg@5": 0.9286
+        },
+        "hybrid:normalized": {
+          "queries": 54,
+          "recall@1": 0.7901,
+          "hit@1": 0.9259,
+          "recall@3": 0.9846,
+          "hit@3": 1.0,
+          "recall@5": 1.0,
+          "hit@5": 1.0,
+          "precision@3": 0.4198,
+          "mrr": 0.963,
+          "ndcg@5": 0.9652
+        },
+        "hybrid_rerank:normalized": {
+          "queries": 54,
+          "recall@1": 0.8272,
+          "hit@1": 0.963,
+          "recall@3": 0.9815,
+          "hit@3": 0.9815,
+          "recall@5": 1.0,
+          "hit@5": 1.0,
+          "precision@3": 0.4259,
+          "mrr": 0.9738,
+          "ndcg@5": 0.9802
+        }
+      },
+      "verification": {
+        "items": 53,
+        "accuracy": 1.0,
+        "macro_f1": 1.0,
+        "per_label": {
+          "covered": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 28
+          },
+          "excluded": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 11
+          },
+          "conditional": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 5
+          },
+          "conflict": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "insufficient": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 7
+          }
+        },
+        "exclusion_identification": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 11
+        },
+        "conflict_detection": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 2
+        },
+        "ambiguity_detection": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 14
+        },
+        "unsupported_answer_rate": 0.0,
+        "unsupported_answer_rate_definition": "Share of items whose correct answer is non-definitive (conditional, conflict or insufficient evidence) for which the system nevertheless returned covered/excluded.",
+        "confusion": [
+          {
+            "gold": "conditional",
+            "pred": "conditional",
+            "count": 5
+          },
+          {
+            "gold": "conflict",
+            "pred": "conflict",
+            "count": 2
+          },
+          {
+            "gold": "covered",
+            "pred": "covered",
+            "count": 28
+          },
+          {
+            "gold": "excluded",
+            "pred": "excluded",
+            "count": 11
+          },
+          {
+            "gold": "insufficient",
+            "pred": "insufficient",
+            "count": 7
+          }
+        ]
+      }
+    }
+  },
+  "error_examples": [
+    {
+      "id": "q02",
+      "query": "Private ward accommodation",
+      "type": "retrieval_miss@3 (bm25:raw)",
+      "expected": [
+        "E01:E1.1",
+        "POL:2.1"
+      ],
+      "top3": []
+    },
+    {
+      "id": "q03",
+      "query": "Semi-private bed charges",
+      "type": "retrieval_miss@3 (bm25:raw)",
+      "expected": [
+        "POL:2.2",
+        "POL:2.1"
+      ],
+      "top3": [
+        "1.3",
+        "4.3",
+        "2.3"
+      ]
+    },
+    {
+      "id": "q10",
+      "query": "Anesthesia charges",
+      "type": "retrieval_miss@3 (bm25:raw)",
+      "expected": [
+        "POL:2.4"
+      ],
+      "top3": [
+        "1.3",
+        "4.3",
+        "2.3"
+      ]
+    },
+    {
+      "id": "q11",
+      "query": "OT Charges",
+      "type": "retrieval_miss@3 (bm25:raw)",
+      "expected": [
+        "POL:2.1"
+      ],
+      "top3": [
+        "1.3",
+        "4.3",
+        "2.3"
+      ]
+    },
+    {
+      "id": "q11",
+      "query": "OT Charges",
+      "type": "retrieval_miss@3 (semantic:raw)",
+      "expected": [
+        "POL:2.1"
+      ],
+      "top3": [
+        "4.3",
+        "1.3",
+        "E1.2"
+      ]
+    },
+    {
+      "id": "q16",
+      "query": "USG Abdomen",
+      "type": "retrieval_miss@3 (bm25:raw)",
+      "expected": [
+        "POL:2.5"
+      ],
+      "top3": []
+    }
+  ],
+  "per_query": [
+    {
+      "id": "q01",
+      "group": "room",
+      "query": "Deluxe Room Charges",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "E01:E1.1": 2,
+        "POL:2.1": 2
+      },
+      "gold": "covered",
+      "tags": [
+        "direct_keyword",
+        "amendment"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "E1.1",
+        "2.1"
+      ],
+      "explanation": "Payable under E1.1 (Revised Room Rent Limit), 2.1 (In-patient Hospitalisation Expenses).",
+      "top3": {
+        "bm25:raw": [
+          "E1.1",
+          "2.1",
+          "1.3"
+        ],
+        "bm25:normalized": [
+          "E1.1",
+          "2.1",
+          "1.3"
+        ],
+        "semantic:raw": [
+          "E1.1",
+          "4.3",
+          "2.3"
+        ],
+        "semantic:normalized": [
+          "E1.1",
+          "4.3",
+          "2.3"
+        ],
+        "hybrid:normalized": [
+          "E1.1",
+          "2.1",
+          "4.3"
+        ],
+        "hybrid_rerank:normalized": [
+          "E1.1",
+          "2.1",
+          "4.3"
+        ]
+      }
+    },
+    {
+      "id": "q02",
+      "group": "room",
+      "query": "Private ward accommodation",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "E01:E1.1": 2,
+        "POL:2.1": 1
+      },
+      "gold": "covered",
+      "tags": [
+        "paraphrase"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "E1.1",
+        "2.1"
+      ],
+      "explanation": "Payable under E1.1 (Revised Room Rent Limit), 2.1 (In-patient Hospitalisation Expenses).",
+      "top3": {
+        "bm25:raw": [],
+        "bm25:normalized": [
+          "E1.1",
+          "2.1"
+        ],
+        "semantic:raw": [
+          "E1.1",
+          "1.1",
+          "2.1"
+        ],
+        "semantic:normalized": [
+          "E1.1",
+          "1.1",
+          "2.1"
+        ],
+        "hybrid:normalized": [
+          "E1.1",
+          "2.1",
+          "1.1"
+        ],
+        "hybrid_rerank:normalized": [
+          "E1.1",
+          "2.1",
+          "4.3"
+        ]
+      }
+    },
+    {
+      "id": "q03",
+      "group": "room",
+      "query": "Semi-private bed charges",
+      "version": "v1",
+      "split": "eval",
+      "relevant": {
+        "POL:2.2": 2,
+        "POL:2.1": 1
+      },
+      "gold": "covered",
+      "tags": [
+        "paraphrase",
+        "version_filter"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "2.2",
+        "2.1"
+      ],
+      "explanation": "Payable under 2.2 (Room Rent Limit), 2.1 (In-patient Hospitalisation Expenses).",
+      "top3": {
+        "bm25:raw": [
+          "1.3",
+          "4.3",
+          "2.3"
+        ],
+        "bm25:normalized": [
+          "2.2",
+          "2.1",
+          "1.3"
+        ],
+        "semantic:raw": [
+          "4.3",
+          "2.2",
+          "1.3"
+        ],
+        "semantic:normalized": [
+          "2.2",
+          "4.3",
+          "1.3"
+        ],
+        "hybrid:normalized": [
+          "2.2",
+          "4.3",
+          "1.3"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.2",
+          "2.1",
+          "4.3"
+        ]
+      }
+    },
+    {
+      "id": "q04",
+      "group": "icu",
+      "query": "ICU Charges",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "POL:2.3": 2
+      },
+      "gold": "covered",
+      "tags": [
+        "direct_keyword",
+        "abbreviation"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "2.3"
+      ],
+      "explanation": "Payable under 2.3 (Intensive Care Unit Charges).",
+      "top3": {
+        "bm25:raw": [
+          "2.3",
+          "1.3",
+          "4.3"
+        ],
+        "bm25:normalized": [
+          "2.3",
+          "A1.1",
+          "1.1"
+        ],
+        "semantic:raw": [
+          "2.3",
+          "1.3",
+          "4.3"
+        ],
+        "semantic:normalized": [
+          "2.3",
+          "2.1",
+          "2.4"
+        ],
+        "hybrid:normalized": [
+          "2.3",
+          "2.1",
+          "2.10"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.3",
+          "2.1",
+          "1.3"
+        ]
+      }
+    },
+    {
+      "id": "q05",
+      "group": "icu",
+      "query": "Intensive care unit stay",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "POL:2.3": 2
+      },
+      "gold": "covered",
+      "tags": [
+        "paraphrase"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "2.3"
+      ],
+      "explanation": "Payable under 2.3 (Intensive Care Unit Charges).",
+      "top3": {
+        "bm25:raw": [
+          "2.3",
+          "A1.1",
+          "1.1"
+        ],
+        "bm25:normalized": [
+          "2.3",
+          "A1.1",
+          "1.1"
+        ],
+        "semantic:raw": [
+          "2.3",
+          "1.1",
+          "2.6"
+        ],
+        "semantic:normalized": [
+          "2.3",
+          "1.1",
+          "2.6"
+        ],
+        "hybrid:normalized": [
+          "2.3",
+          "1.1",
+          "2.10"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.3",
+          "1.1",
+          "2.1"
+        ]
+      }
+    },
+    {
+      "id": "q06",
+      "group": "icu",
+      "query": "ICCU bed charges",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "POL:2.3": 2
+      },
+      "gold": "covered",
+      "tags": [
+        "abbreviation"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "2.3"
+      ],
+      "explanation": "Payable under 2.3 (Intensive Care Unit Charges).",
+      "top3": {
+        "bm25:raw": [
+          "1.3",
+          "4.3",
+          "2.3"
+        ],
+        "bm25:normalized": [
+          "2.3",
+          "1.3",
+          "A1.1"
+        ],
+        "semantic:raw": [
+          "2.3",
+          "E1.1",
+          "1.3"
+        ],
+        "semantic:normalized": [
+          "2.3",
+          "2.1",
+          "2.4"
+        ],
+        "hybrid:normalized": [
+          "2.3",
+          "2.1",
+          "E1.1"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.3",
+          "2.1",
+          "2.8"
+        ]
+      }
+    },
+    {
+      "id": "q07",
+      "group": "surgeon",
+      "query": "Surgeon Fee - Lap. Appendicectomy",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "POL:2.4": 2
+      },
+      "gold": "covered",
+      "tags": [
+        "direct_keyword"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "2.4"
+      ],
+      "explanation": "Payable under 2.4 (Professional Fees).",
+      "top3": {
+        "bm25:raw": [
+          "2.4"
+        ],
+        "bm25:normalized": [
+          "2.4"
+        ],
+        "semantic:raw": [
+          "2.4",
+          "2.1",
+          "2.7"
+        ],
+        "semantic:normalized": [
+          "2.4",
+          "2.1",
+          "2.7"
+        ],
+        "hybrid:normalized": [
+          "2.4",
+          "2.1",
+          "2.7"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.4",
+          "2.9",
+          "2.3"
+        ]
+      }
+    },
+    {
+      "id": "q08",
+      "group": "surgeon",
+      "query": "Operating surgeon professional charges",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "POL:2.4": 2
+      },
+      "gold": "covered",
+      "tags": [
+        "paraphrase"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "2.4"
+      ],
+      "explanation": "Payable under 2.4 (Professional Fees).",
+      "top3": {
+        "bm25:raw": [
+          "2.4",
+          "1.3",
+          "4.3"
+        ],
+        "bm25:normalized": [
+          "2.4",
+          "1.3",
+          "4.3"
+        ],
+        "semantic:raw": [
+          "2.4",
+          "2.1",
+          "2.7"
+        ],
+        "semantic:normalized": [
+          "2.4",
+          "2.1",
+          "2.7"
+        ],
+        "hybrid:normalized": [
+          "2.4",
+          "2.1",
+          "4.3"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.4",
+          "2.1",
+          "2.9"
+        ]
+      }
+    },
+    {
+      "id": "q09",
+      "group": "anaesthesia",
+      "query": "Anaesthetist Fee",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "POL:2.4": 2
+      },
+      "gold": "covered",
+      "tags": [
+        "direct_keyword"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "2.4"
+      ],
+      "explanation": "Payable under 2.4 (Professional Fees).",
+      "top3": {
+        "bm25:raw": [
+          "2.4"
+        ],
+        "bm25:normalized": [
+          "2.4"
+        ],
+        "semantic:raw": [
+          "2.4",
+          "2.1",
+          "E1.3"
+        ],
+        "semantic:normalized": [
+          "2.4",
+          "2.1",
+          "2.7"
+        ],
+        "hybrid:normalized": [
+          "2.4",
+          "2.1",
+          "2.7"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.4",
+          "2.8",
+          "2.3"
+        ]
+      }
+    },
+    {
+      "id": "q10",
+      "group": "anaesthesia",
+      "query": "Anesthesia charges",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "POL:2.4": 2
+      },
+      "gold": "covered",
+      "tags": [
+        "synonym",
+        "spelling_variant"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "2.4"
+      ],
+      "explanation": "Payable under 2.4 (Professional Fees).",
+      "top3": {
+        "bm25:raw": [
+          "1.3",
+          "4.3",
+          "2.3"
+        ],
+        "bm25:normalized": [
+          "2.4",
+          "1.3",
+          "4.3"
+        ],
+        "semantic:raw": [
+          "2.4",
+          "4.3",
+          "2.7"
+        ],
+        "semantic:normalized": [
+          "2.4",
+          "2.1",
+          "2.7"
+        ],
+        "hybrid:normalized": [
+          "2.4",
+          "4.3",
+          "2.1"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.4",
+          "2.3",
+          "2.8"
+        ]
+      }
+    },
+    {
+      "id": "q11",
+      "group": "ot",
+      "query": "OT Charges",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "POL:2.1": 2
+      },
+      "gold": "covered",
+      "tags": [
+        "abbreviation"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "2.1"
+      ],
+      "explanation": "Payable under 2.1 (In-patient Hospitalisation Expenses).",
+      "top3": {
+        "bm25:raw": [
+          "1.3",
+          "4.3",
+          "2.3"
+        ],
+        "bm25:normalized": [
+          "2.1",
+          "1.3",
+          "4.3"
+        ],
+        "semantic:raw": [
+          "4.3",
+          "1.3",
+          "E1.2"
+        ],
+        "semantic:normalized": [
+          "2.1",
+          "4.3",
+          "2.3"
+        ],
+        "hybrid:normalized": [
+          "2.1",
+          "4.3",
+          "1.3"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.1",
+          "2.8",
+          "1.3"
+        ]
+      }
+    },
+    {
+      "id": "q12",
+      "group": "ot",
+      "query": "Operation theatre rent",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "POL:2.1": 2
+      },
+      "gold": "covered",
+      "tags": [
+        "paraphrase"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "2.1"
+      ],
+      "explanation": "Payable under 2.1 (In-patient Hospitalisation Expenses).",
+      "top3": {
+        "bm25:raw": [
+          "2.1",
+          "E1.1"
+        ],
+        "bm25:normalized": [
+          "2.1",
+          "E1.1"
+        ],
+        "semantic:raw": [
+          "2.1",
+          "E1.1",
+          "4.3"
+        ],
+        "semantic:normalized": [
+          "2.1",
+          "1.1",
+          "E1.1"
+        ],
+        "hybrid:normalized": [
+          "2.1",
+          "E1.1",
+          "1.1"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.1",
+          "E1.1",
+          "2.8"
+        ]
+      }
+    },
+    {
+      "id": "q13",
+      "group": "lab",
+      "query": "CBC",
+      "version": "v2",
+      "split": "dev",
+      "relevant": {
+        "POL:2.5": 2
+      },
+      "gold": "covered",
+      "tags": [
+        "abbreviation"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "2.5"
+      ],
+      "explanation": "Payable under 2.5 (Diagnostic Investigations).",
+      "top3": {
+        "bm25:raw": [],
+        "bm25:normalized": [
+          "2.5"
+        ],
+        "semantic:raw": [
+          "2.3",
+          "2.5",
+          "2.6"
+        ],
+        "semantic:normalized": [
+          "2.5",
+          "2.6",
+          "1.1"
+        ],
+        "hybrid:normalized": [
+          "2.5",
+          "2.6",
+          "1.1"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.5",
+          "1.1",
+          "2.3"
+        ]
+      }
+    },
+    {
+      "id": "q14",
+      "group": "lab",
+      "query": "Blood culture and sensitivity",
+      "version": "v2",
+      "split": "dev",
+      "relevant": {
+        "POL:2.5": 2
+      },
+      "gold": "covered",
+      "tags": [
+        "paraphrase"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "2.5"
+      ],
+      "explanation": "Payable under 2.5 (Diagnostic Investigations).",
+      "top3": {
+        "bm25:raw": [],
+        "bm25:normalized": [
+          "2.5"
+        ],
+        "semantic:raw": [
+          "2.5",
+          "2.6",
+          "1.2"
+        ],
+        "semantic:normalized": [
+          "2.5",
+          "2.6",
+          "1.2"
+        ],
+        "hybrid:normalized": [
+          "2.5",
+          "2.6",
+          "1.2"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.5",
+          "1.3",
+          "1.1"
+        ]
+      }
+    },
+    {
+      "id": "q15",
+      "group": "lab",
+      "query": "LFT, RFT",
+      "version": "v2",
+      "split": "dev",
+      "relevant": {
+        "POL:2.5": 2
+      },
+      "gold": "covered",
+      "tags": [
+        "abbreviation"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "2.5"
+      ],
+      "explanation": "Payable under 2.5 (Diagnostic Investigations).",
+      "top3": {
+        "bm25:raw": [],
+        "bm25:normalized": [
+          "2.5"
+        ],
+        "semantic:raw": [
+          "2.5",
+          "2.10",
+          "2.8"
+        ],
+        "semantic:normalized": [
+          "2.5",
+          "2.6",
+          "A1.4"
+        ],
+        "hybrid:normalized": [
+          "2.5",
+          "2.6",
+          "A1.4"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.5",
+          "2.6",
+          "1.1"
+        ]
+      }
+    },
+    {
+      "id": "q16",
+      "group": "imaging",
+      "query": "USG Abdomen",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "POL:2.5": 2
+      },
+      "gold": "covered",
+      "tags": [
+        "abbreviation"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "2.5"
+      ],
+      "explanation": "Payable under 2.5 (Diagnostic Investigations).",
+      "top3": {
+        "bm25:raw": [],
+        "bm25:normalized": [
+          "2.5"
+        ],
+        "semantic:raw": [
+          "2.5",
+          "4.1",
+          "2.11"
+        ],
+        "semantic:normalized": [
+          "2.5",
+          "1.1",
+          "2.4"
+        ],
+        "hybrid:normalized": [
+          "2.5",
+          "1.1",
+          "2.4"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.5",
+          "2.9",
+          "2.7"
+        ]
+      }
+    },
+    {
+      "id": "q17",
+      "group": "imaging",
+      "query": "Chest X-ray",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "POL:2.5": 2
+      },
+      "gold": "covered",
+      "tags": [
+        "direct_keyword"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "2.5"
+      ],
+      "explanation": "Payable under 2.5 (Diagnostic Investigations).",
+      "top3": {
+        "bm25:raw": [
+          "2.5"
+        ],
+        "bm25:normalized": [
+          "2.5"
+        ],
+        "semantic:raw": [
+          "2.5",
+          "2.3",
+          "2.10"
+        ],
+        "semantic:normalized": [
+          "2.5",
+          "2.10",
+          "2.3"
+        ],
+        "hybrid:normalized": [
+          "2.5",
+          "2.10",
+          "2.3"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.5",
+          "1.1",
+          "4.4"
+        ]
+      }
+    },
+    {
+      "id": "q18",
+      "group": "imaging",
+      "query": "MRI brain plain",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "POL:2.5": 2
+      },
+      "gold": "covered",
+      "tags": [
+        "direct_keyword"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "2.5"
+      ],
+      "explanation": "Payable under 2.5 (Diagnostic Investigations).",
+      "top3": {
+        "bm25:raw": [
+          "2.5"
+        ],
+        "bm25:normalized": [
+          "2.5"
+        ],
+        "semantic:raw": [
+          "2.5",
+          "1.2",
+          "1.1"
+        ],
+        "semantic:normalized": [
+          "2.5",
+          "1.1",
+          "1.2"
+        ],
+        "hybrid:normalized": [
+          "2.5",
+          "1.1",
+          "1.2"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.5",
+          "2.9",
+          "1.1"
+        ]
+      }
+    },
+    {
+      "id": "q19",
+      "group": "medicine",
+      "query": "Inj. Ceftriaxone 1g",
+      "version": "v2",
+      "split": "dev",
+      "relevant": {
+        "POL:2.6": 2
+      },
+      "gold": "covered",
+      "tags": [
+        "abbreviation",
+        "paraphrase"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "2.6"
+      ],
+      "explanation": "Payable under 2.6 (Medicines and Drugs).",
+      "top3": {
+        "bm25:raw": [],
+        "bm25:normalized": [
+          "2.6"
+        ],
+        "semantic:raw": [
+          "5.1",
+          "E1.3",
+          "2.8"
+        ],
+        "semantic:normalized": [
+          "2.6",
+          "2.10",
+          "A1.4"
+        ],
+        "hybrid:normalized": [
+          "2.6",
+          "2.10",
+          "A1.4"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.6",
+          "2.10",
+          "3.3"
+        ]
+      }
+    },
+    {
+      "id": "q20",
+      "group": "medicine",
+      "query": "IV fluids - normal saline",
+      "version": "v2",
+      "split": "dev",
+      "relevant": {
+        "POL:2.6": 2
+      },
+      "gold": "covered",
+      "tags": [
+        "abbreviation"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "2.6"
+      ],
+      "explanation": "Payable under 2.6 (Medicines and Drugs).",
+      "top3": {
+        "bm25:raw": [
+          "2.6"
+        ],
+        "bm25:normalized": [
+          "2.6"
+        ],
+        "semantic:raw": [
+          "2.6",
+          "E1.3",
+          "4.1"
+        ],
+        "semantic:normalized": [
+          "2.6",
+          "A1.3",
+          "4.1"
+        ],
+        "hybrid:normalized": [
+          "2.6",
+          "A1.3",
+          "4.1"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.6",
+          "4.2",
+          "2.10"
+        ]
+      }
+    },
+    {
+      "id": "q21",
+      "group": "medicine",
+      "query": "Antibiotic tablets during stay",
+      "version": "v2",
+      "split": "dev",
+      "relevant": {
+        "POL:2.6": 2
+      },
+      "gold": "covered",
+      "tags": [
+        "paraphrase"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "2.6"
+      ],
+      "explanation": "Payable under 2.6 (Medicines and Drugs).",
+      "top3": {
+        "bm25:raw": [],
+        "bm25:normalized": [
+          "2.6"
+        ],
+        "semantic:raw": [
+          "2.6",
+          "2.10",
+          "1.1"
+        ],
+        "semantic:normalized": [
+          "2.6",
+          "2.10",
+          "1.1"
+        ],
+        "hybrid:normalized": [
+          "2.6",
+          "2.10",
+          "1.1"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.6",
+          "2.10",
+          "4.2"
+        ]
+      }
+    },
+    {
+      "id": "q22",
+      "group": "vitamin",
+      "query": "MVI Infusion",
+      "version": "v2",
+      "split": "dev",
+      "relevant": {
+        "POL:4.2": 2,
+        "POL:2.6": 1
+      },
+      "gold": "conditional",
+      "tags": [
+        "abbreviation",
+        "conditional"
+      ],
+      "pred": "conditional",
+      "decisive": [
+        "4.2",
+        "2.6"
+      ],
+      "explanation": "Exclusion 4.2 applies unless prescribed by the treating doctor as part of the treatment for the condition requiring hospitalisation. Whether the exception is met is not established.",
+      "top3": {
+        "bm25:raw": [],
+        "bm25:normalized": [
+          "4.2"
+        ],
+        "semantic:raw": [
+          "2.3",
+          "2.10",
+          "2.6"
+        ],
+        "semantic:normalized": [
+          "4.2",
+          "2.6",
+          "2.10"
+        ],
+        "hybrid:normalized": [
+          "4.2",
+          "2.6",
+          "2.10"
+        ],
+        "hybrid_rerank:normalized": [
+          "4.2",
+          "2.6",
+          "5.1"
+        ]
+      }
+    },
+    {
+      "id": "q23",
+      "group": "vitamin",
+      "query": "Vitamin B12 injection",
+      "version": "v2",
+      "split": "dev",
+      "relevant": {
+        "POL:4.2": 2,
+        "POL:2.6": 1
+      },
+      "gold": "conditional",
+      "tags": [
+        "conditional"
+      ],
+      "pred": "conditional",
+      "decisive": [
+        "4.2",
+        "2.6"
+      ],
+      "explanation": "Exclusion 4.2 applies unless prescribed by the treating doctor as part of the treatment for the condition requiring hospitalisation. Whether the exception is met is not established.",
+      "top3": {
+        "bm25:raw": [
+          "4.2"
+        ],
+        "bm25:normalized": [
+          "4.2"
+        ],
+        "semantic:raw": [
+          "4.2",
+          "2.6",
+          "2.10"
+        ],
+        "semantic:normalized": [
+          "4.2",
+          "2.6",
+          "2.10"
+        ],
+        "hybrid:normalized": [
+          "4.2",
+          "2.6",
+          "2.10"
+        ],
+        "hybrid_rerank:normalized": [
+          "4.2",
+          "2.6",
+          "3.3"
+        ]
+      }
+    },
+    {
+      "id": "q24",
+      "group": "vitamin",
+      "query": "Protein nutritional supplement powder",
+      "version": "v2",
+      "split": "dev",
+      "relevant": {
+        "POL:4.2": 2
+      },
+      "gold": "conditional",
+      "tags": [
+        "conditional",
+        "paraphrase"
+      ],
+      "pred": "conditional",
+      "decisive": [
+        "4.2",
+        "2.6"
+      ],
+      "explanation": "Exclusion 4.2 applies unless prescribed by the treating doctor as part of the treatment for the condition requiring hospitalisation. Whether the exception is met is not established.",
+      "top3": {
+        "bm25:raw": [
+          "4.2"
+        ],
+        "bm25:normalized": [
+          "4.2"
+        ],
+        "semantic:raw": [
+          "A1.4",
+          "4.2",
+          "2.10"
+        ],
+        "semantic:normalized": [
+          "4.2",
+          "A1.4",
+          "2.10"
+        ],
+        "hybrid:normalized": [
+          "4.2",
+          "A1.4",
+          "2.10"
+        ],
+        "hybrid_rerank:normalized": [
+          "4.2",
+          "A1.4",
+          "2.5"
+        ]
+      }
+    },
+    {
+      "id": "q25",
+      "group": "consumables_v2",
+      "query": "Disposable gloves",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "E01:E1.3": 2,
+        "POL:4.1": 1,
+        "POL:A1.2": 1
+      },
+      "gold": "covered",
+      "tags": [
+        "amendment",
+        "override"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "E1.3"
+      ],
+      "explanation": "Exclusion A1.2 does not apply: E1.3 begins 'Notwithstanding' and expressly overrides it. Exclusion 4.1 does not apply: E1.3 begins 'Notwithstanding' and expressly overrides it. Payable under E1.3 (Consumables Cover).",
+      "top3": {
+        "bm25:raw": [
+          "A1.2",
+          "4.1",
+          "E1.3"
+        ],
+        "bm25:normalized": [
+          "4.1",
+          "E1.3",
+          "A1.2"
+        ],
+        "semantic:raw": [
+          "A1.2",
+          "A1.3",
+          "E1.3"
+        ],
+        "semantic:normalized": [
+          "A1.2",
+          "A1.3",
+          "E1.3"
+        ],
+        "hybrid:normalized": [
+          "A1.2",
+          "4.1",
+          "E1.3"
+        ],
+        "hybrid_rerank:normalized": [
+          "E1.3",
+          "4.1",
+          "A1.2"
+        ]
+      }
+    },
+    {
+      "id": "q26",
+      "group": "consumables_v2",
+      "query": "Face masks used in ward",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "E01:E1.3": 2,
+        "POL:4.1": 1,
+        "POL:A1.2": 1
+      },
+      "gold": "covered",
+      "tags": [
+        "amendment",
+        "override",
+        "paraphrase"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "E1.3",
+        "E1.1",
+        "2.1"
+      ],
+      "explanation": "Exclusion A1.2 does not apply: E1.3 begins 'Notwithstanding' and expressly overrides it. Exclusion 4.1 does not apply: E1.3 begins 'Notwithstanding' and expressly overrides it. Payable under E1.3 (Consumables Cover), E1.1 (Revised Room Rent Limit), 2.1 (In-patient Hospitalisation Expenses).",
+      "top3": {
+        "bm25:raw": [
+          "E1.3",
+          "2.10",
+          "A1.2"
+        ],
+        "bm25:normalized": [
+          "E1.1",
+          "E1.3",
+          "2.1"
+        ],
+        "semantic:raw": [
+          "A1.2",
+          "E1.3",
+          "2.10"
+        ],
+        "semantic:normalized": [
+          "A1.2",
+          "E1.3",
+          "2.10"
+        ],
+        "hybrid:normalized": [
+          "E1.3",
+          "A1.2",
+          "2.10"
+        ],
+        "hybrid_rerank:normalized": [
+          "E1.3",
+          "4.1",
+          "A1.2"
+        ]
+      }
+    },
+    {
+      "id": "q27",
+      "group": "consumables_v1",
+      "query": "Disposable gloves",
+      "version": "v1",
+      "split": "eval",
+      "relevant": {
+        "POL:4.1": 2,
+        "POL:A1.2": 2
+      },
+      "gold": "excluded",
+      "tags": [
+        "exclusion",
+        "amendment"
+      ],
+      "pred": "excluded",
+      "decisive": [
+        "A1.2",
+        "4.1"
+      ],
+      "explanation": "Exclusion A1.2, 4.1 names this item.",
+      "top3": {
+        "bm25:raw": [
+          "A1.2",
+          "4.1",
+          "A1.3"
+        ],
+        "bm25:normalized": [
+          "4.1",
+          "A1.2",
+          "A1.3"
+        ],
+        "semantic:raw": [
+          "A1.2",
+          "A1.3",
+          "4.1"
+        ],
+        "semantic:normalized": [
+          "A1.2",
+          "A1.3",
+          "4.1"
+        ],
+        "hybrid:normalized": [
+          "A1.2",
+          "4.1",
+          "A1.3"
+        ],
+        "hybrid_rerank:normalized": [
+          "4.1",
+          "A1.2",
+          "A1.3"
+        ]
+      }
+    },
+    {
+      "id": "q28",
+      "group": "consumables_v1",
+      "query": "Surgical masks",
+      "version": "v1",
+      "split": "eval",
+      "relevant": {
+        "POL:4.1": 2,
+        "POL:A1.2": 2
+      },
+      "gold": "excluded",
+      "tags": [
+        "exclusion"
+      ],
+      "pred": "excluded",
+      "decisive": [
+        "4.1",
+        "A1.2"
+      ],
+      "explanation": "Exclusion 4.1, A1.2 names this item.",
+      "top3": {
+        "bm25:raw": [
+          "A1.2",
+          "2.11",
+          "4.1"
+        ],
+        "bm25:normalized": [
+          "4.1",
+          "A1.2",
+          "2.11"
+        ],
+        "semantic:raw": [
+          "A1.2",
+          "4.4",
+          "2.11"
+        ],
+        "semantic:normalized": [
+          "A1.2",
+          "4.1",
+          "A1.3"
+        ],
+        "hybrid:normalized": [
+          "4.1",
+          "A1.2",
+          "2.11"
+        ],
+        "hybrid_rerank:normalized": [
+          "4.1",
+          "A1.2",
+          "2.11"
+        ]
+      }
+    },
+    {
+      "id": "q29",
+      "group": "consumables_v1",
+      "query": "Syringes",
+      "version": "v1",
+      "split": "eval",
+      "relevant": {
+        "POL:4.1": 2,
+        "POL:A1.3": 2
+      },
+      "gold": "excluded",
+      "tags": [
+        "exclusion",
+        "direct_keyword"
+      ],
+      "pred": "excluded",
+      "decisive": [
+        "4.1",
+        "A1.3"
+      ],
+      "explanation": "Exclusion 4.1, A1.3 names this item.",
+      "top3": {
+        "bm25:raw": [
+          "A1.3",
+          "4.1"
+        ],
+        "bm25:normalized": [
+          "4.1",
+          "A1.3"
+        ],
+        "semantic:raw": [
+          "A1.3",
+          "2.6",
+          "A1.4"
+        ],
+        "semantic:normalized": [
+          "A1.3",
+          "4.1",
+          "A1.1"
+        ],
+        "hybrid:normalized": [
+          "4.1",
+          "A1.3",
+          "A1.1"
+        ],
+        "hybrid_rerank:normalized": [
+          "4.1",
+          "A1.3",
+          "2.6"
+        ]
+      }
+    },
+    {
+      "id": "q30",
+      "group": "non_medical",
+      "query": "Admission kit",
+      "version": "v2",
+      "split": "dev",
+      "relevant": {
+        "POL:4.1": 2,
+        "POL:A1.1": 2
+      },
+      "gold": "excluded",
+      "tags": [
+        "exclusion",
+        "direct_keyword"
+      ],
+      "pred": "excluded",
+      "decisive": [
+        "4.1",
+        "A1.1"
+      ],
+      "explanation": "Exclusion 4.1, A1.1 names this item.",
+      "top3": {
+        "bm25:raw": [
+          "A1.1",
+          "4.1",
+          "A1.4"
+        ],
+        "bm25:normalized": [
+          "4.1",
+          "1.2",
+          "A1.1"
+        ],
+        "semantic:raw": [
+          "A1.4",
+          "4.1",
+          "E1.3"
+        ],
+        "semantic:normalized": [
+          "4.1",
+          "1.2",
+          "A1.1"
+        ],
+        "hybrid:normalized": [
+          "4.1",
+          "1.2",
+          "A1.1"
+        ],
+        "hybrid_rerank:normalized": [
+          "4.1",
+          "A1.1",
+          "1.2"
+        ]
+      }
+    },
+    {
+      "id": "q31",
+      "group": "non_medical",
+      "query": "Toiletries and soap",
+      "version": "v2",
+      "split": "dev",
+      "relevant": {
+        "POL:A1.1": 2,
+        "POL:4.1": 2
+      },
+      "gold": "excluded",
+      "tags": [
+        "exclusion"
+      ],
+      "pred": "excluded",
+      "decisive": [
+        "A1.1",
+        "4.1"
+      ],
+      "explanation": "Exclusion A1.1, 4.1 names this item.",
+      "top3": {
+        "bm25:raw": [
+          "A1.1",
+          "4.1"
+        ],
+        "bm25:normalized": [
+          "A1.1",
+          "4.1",
+          "1.2"
+        ],
+        "semantic:raw": [
+          "A1.1",
+          "4.1",
+          "2.6"
+        ],
+        "semantic:normalized": [
+          "A1.1",
+          "4.1",
+          "1.2"
+        ],
+        "hybrid:normalized": [
+          "A1.1",
+          "4.1",
+          "1.2"
+        ],
+        "hybrid_rerank:normalized": [
+          "4.1",
+          "A1.1",
+          "1.2"
+        ]
+      }
+    },
+    {
+      "id": "q32",
+      "group": "non_medical",
+      "query": "Toothpaste and brush",
+      "version": "v2",
+      "split": "dev",
+      "relevant": {
+        "POL:A1.1": 2
+      },
+      "gold": "excluded",
+      "tags": [
+        "exclusion",
+        "paraphrase"
+      ],
+      "pred": "excluded",
+      "decisive": [
+        "A1.1"
+      ],
+      "explanation": "Exclusion A1.1 names this item.",
+      "top3": {
+        "bm25:raw": [
+          "A1.1"
+        ],
+        "bm25:normalized": [
+          "1.2",
+          "4.1",
+          "A1.1"
+        ],
+        "semantic:raw": [
+          "A1.1",
+          "A1.3",
+          "A1.2"
+        ],
+        "semantic:normalized": [
+          "A1.1",
+          "1.2",
+          "A1.3"
+        ],
+        "hybrid:normalized": [
+          "1.2",
+          "A1.1",
+          "4.1"
+        ],
+        "hybrid_rerank:normalized": [
+          "1.2",
+          "4.1",
+          "A1.1"
+        ]
+      }
+    },
+    {
+      "id": "q33",
+      "group": "comfort",
+      "query": "TV charges",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "POL:4.3": 2
+      },
+      "gold": "excluded",
+      "tags": [
+        "exclusion",
+        "abbreviation"
+      ],
+      "pred": "excluded",
+      "decisive": [
+        "4.3"
+      ],
+      "explanation": "Exclusion 4.3 names this item.",
+      "top3": {
+        "bm25:raw": [
+          "1.3",
+          "4.3",
+          "2.3"
+        ],
+        "bm25:normalized": [
+          "4.3",
+          "A1.1",
+          "1.3"
+        ],
+        "semantic:raw": [
+          "4.3",
+          "1.3",
+          "E1.1"
+        ],
+        "semantic:normalized": [
+          "4.3",
+          "1.3",
+          "E1.1"
+        ],
+        "hybrid:normalized": [
+          "4.3",
+          "1.3",
+          "2.3"
+        ],
+        "hybrid_rerank:normalized": [
+          "4.3",
+          "1.3",
+          "A1.1"
+        ]
+      }
+    },
+    {
+      "id": "q34",
+      "group": "comfort",
+      "query": "Attendant charges",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "POL:4.3": 2
+      },
+      "gold": "excluded",
+      "tags": [
+        "exclusion",
+        "direct_keyword"
+      ],
+      "pred": "excluded",
+      "decisive": [
+        "4.3"
+      ],
+      "explanation": "Exclusion 4.3 names this item.",
+      "top3": {
+        "bm25:raw": [
+          "4.3",
+          "1.3",
+          "2.3"
+        ],
+        "bm25:normalized": [
+          "4.3",
+          "A1.1",
+          "1.3"
+        ],
+        "semantic:raw": [
+          "4.3",
+          "E1.1",
+          "1.3"
+        ],
+        "semantic:normalized": [
+          "4.3",
+          "1.3",
+          "2.4"
+        ],
+        "hybrid:normalized": [
+          "4.3",
+          "1.3",
+          "A1.1"
+        ],
+        "hybrid_rerank:normalized": [
+          "4.3",
+          "1.3",
+          "E1.1"
+        ]
+      }
+    },
+    {
+      "id": "q35",
+      "group": "comfort",
+      "query": "Laundry service",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "POL:4.3": 2
+      },
+      "gold": "excluded",
+      "tags": [
+        "exclusion"
+      ],
+      "pred": "excluded",
+      "decisive": [
+        "4.3"
+      ],
+      "explanation": "Exclusion 4.3 names this item.",
+      "top3": {
+        "bm25:raw": [
+          "4.3",
+          "1.3"
+        ],
+        "bm25:normalized": [
+          "4.3",
+          "A1.1",
+          "1.3"
+        ],
+        "semantic:raw": [
+          "A1.1",
+          "A1.3",
+          "4.3"
+        ],
+        "semantic:normalized": [
+          "A1.1",
+          "4.3",
+          "A1.3"
+        ],
+        "hybrid:normalized": [
+          "4.3",
+          "A1.1",
+          "1.3"
+        ],
+        "hybrid_rerank:normalized": [
+          "4.3",
+          "A1.1",
+          "A1.2"
+        ]
+      }
+    },
+    {
+      "id": "q36",
+      "group": "comfort",
+      "query": "Telephone usage",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "POL:4.3": 2
+      },
+      "gold": "excluded",
+      "tags": [
+        "exclusion"
+      ],
+      "pred": "excluded",
+      "decisive": [
+        "4.3"
+      ],
+      "explanation": "Exclusion 4.3 names this item.",
+      "top3": {
+        "bm25:raw": [
+          "4.3"
+        ],
+        "bm25:normalized": [
+          "4.3",
+          "A1.1"
+        ],
+        "semantic:raw": [
+          "4.3",
+          "1.3",
+          "2.8"
+        ],
+        "semantic:normalized": [
+          "4.3",
+          "1.3",
+          "2.1"
+        ],
+        "hybrid:normalized": [
+          "4.3",
+          "A1.1",
+          "1.3"
+        ],
+        "hybrid_rerank:normalized": [
+          "4.3",
+          "A1.1",
+          "A1.2"
+        ]
+      }
+    },
+    {
+      "id": "q37",
+      "group": "nebulizer",
+      "query": "Nebulizer kit",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "POL:2.10": 2,
+        "POL:A1.4": 2
+      },
+      "gold": "conflict",
+      "tags": [
+        "conflict",
+        "direct_keyword"
+      ],
+      "pred": "conflict",
+      "decisive": [
+        "A1.4",
+        "2.10"
+      ],
+      "explanation": "Item-specific clauses disagree: 2.10 states it is payable while A1.4 states it is not payable. The documents do not establish which prevails.",
+      "top3": {
+        "bm25:raw": [
+          "A1.4",
+          "2.10",
+          "A1.1"
+        ],
+        "bm25:normalized": [
+          "2.10",
+          "A1.4",
+          "A1.1"
+        ],
+        "semantic:raw": [
+          "A1.4",
+          "2.10",
+          "4.1"
+        ],
+        "semantic:normalized": [
+          "2.10",
+          "A1.4",
+          "2.6"
+        ],
+        "hybrid:normalized": [
+          "2.10",
+          "A1.4",
+          "4.1"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.10",
+          "A1.4",
+          "4.1"
+        ]
+      }
+    },
+    {
+      "id": "q38",
+      "group": "nebulizer",
+      "query": "Nebuliser kit for in-patient use",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "POL:2.10": 2,
+        "POL:A1.4": 2
+      },
+      "gold": "conflict",
+      "tags": [
+        "conflict",
+        "spelling_variant"
+      ],
+      "pred": "conflict",
+      "decisive": [
+        "A1.4",
+        "2.10"
+      ],
+      "explanation": "Item-specific clauses disagree: 2.10 states it is payable while A1.4 states it is not payable. The documents do not establish which prevails.",
+      "top3": {
+        "bm25:raw": [
+          "2.10",
+          "A1.4",
+          "1.1"
+        ],
+        "bm25:normalized": [
+          "2.10",
+          "A1.4",
+          "1.1"
+        ],
+        "semantic:raw": [
+          "2.10",
+          "A1.4",
+          "2.6"
+        ],
+        "semantic:normalized": [
+          "2.10",
+          "A1.4",
+          "2.6"
+        ],
+        "hybrid:normalized": [
+          "2.10",
+          "A1.4",
+          "4.1"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.10",
+          "A1.4",
+          "2.1"
+        ]
+      }
+    },
+    {
+      "id": "q39",
+      "group": "ambulance",
+      "query": "Ambulance pickup",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "POL:2.8": 2
+      },
+      "gold": "covered",
+      "tags": [
+        "paraphrase"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "2.8"
+      ],
+      "explanation": "Payable under 2.8 (Road Ambulance).",
+      "top3": {
+        "bm25:raw": [
+          "2.8"
+        ],
+        "bm25:normalized": [
+          "2.8"
+        ],
+        "semantic:raw": [
+          "2.8",
+          "2.6",
+          "2.3"
+        ],
+        "semantic:normalized": [
+          "2.8",
+          "2.6",
+          "2.3"
+        ],
+        "hybrid:normalized": [
+          "2.8",
+          "2.6",
+          "2.3"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.8",
+          "1.1",
+          "2.6"
+        ]
+      }
+    },
+    {
+      "id": "q40",
+      "group": "ambulance",
+      "query": "Road ambulance transfer to hospital",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "POL:2.8": 2
+      },
+      "gold": "covered",
+      "tags": [
+        "direct_keyword"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "2.8"
+      ],
+      "explanation": "Payable under 2.8 (Road Ambulance).",
+      "top3": {
+        "bm25:raw": [
+          "2.8",
+          "1.1"
+        ],
+        "bm25:normalized": [
+          "2.8",
+          "1.1"
+        ],
+        "semantic:raw": [
+          "2.8",
+          "2.6",
+          "2.4"
+        ],
+        "semantic:normalized": [
+          "2.8",
+          "2.6",
+          "2.4"
+        ],
+        "hybrid:normalized": [
+          "2.8",
+          "1.1",
+          "2.6"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.8",
+          "1.1",
+          "E1.3"
+        ]
+      }
+    },
+    {
+      "id": "q41",
+      "group": "missing",
+      "query": "Dietitian consultation",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {},
+      "gold": "insufficient",
+      "tags": [
+        "missing_evidence"
+      ],
+      "pred": "insufficient",
+      "decisive": [],
+      "explanation": "No retrieved clause establishes coverage or exclusion for this item. The documents provided do not answer this; it is not assumed covered or excluded.",
+      "top3": {
+        "bm25:raw": [
+          "2.4",
+          "2.7"
+        ],
+        "bm25:normalized": [
+          "1.3",
+          "2.4",
+          "2.7"
+        ],
+        "semantic:raw": [
+          "4.2",
+          "7.2",
+          "A1.4"
+        ],
+        "semantic:normalized": [
+          "4.2",
+          "2.6",
+          "2.4"
+        ],
+        "hybrid:normalized": [
+          "2.4",
+          "1.3",
+          "4.2"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.7",
+          "4.2",
+          "2.4"
+        ]
+      }
+    },
+    {
+      "id": "q42",
+      "group": "missing",
+      "query": "Physiotherapy session",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {},
+      "gold": "insufficient",
+      "tags": [
+        "missing_evidence"
+      ],
+      "pred": "insufficient",
+      "decisive": [],
+      "explanation": "No retrieved clause establishes coverage or exclusion for this item. The documents provided do not answer this; it is not assumed covered or excluded.",
+      "top3": {
+        "bm25:raw": [],
+        "bm25:normalized": [
+          "1.3"
+        ],
+        "semantic:raw": [
+          "2.10",
+          "2.6",
+          "1.1"
+        ],
+        "semantic:normalized": [
+          "2.10",
+          "2.6",
+          "1.1"
+        ],
+        "hybrid:normalized": [
+          "1.3",
+          "2.10",
+          "2.6"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.10",
+          "2.5",
+          "2.6"
+        ]
+      }
+    },
+    {
+      "id": "q43",
+      "group": "missing2",
+      "query": "Dental scaling",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {},
+      "gold": "insufficient",
+      "tags": [
+        "missing_evidence",
+        "no_definitive_answer"
+      ],
+      "pred": "insufficient",
+      "decisive": [],
+      "explanation": "No retrieved clause establishes coverage or exclusion for this item. The documents provided do not answer this; it is not assumed covered or excluded.",
+      "top3": {
+        "bm25:raw": [],
+        "bm25:normalized": [],
+        "semantic:raw": [
+          "2.9",
+          "A1.1",
+          "1.1"
+        ],
+        "semantic:normalized": [
+          "2.9",
+          "A1.1",
+          "1.1"
+        ],
+        "hybrid:normalized": [
+          "2.9",
+          "A1.1",
+          "1.1"
+        ],
+        "hybrid_rerank:normalized": [
+          "A1.3",
+          "2.11",
+          "A1.1"
+        ]
+      }
+    },
+    {
+      "id": "q44",
+      "group": "missing2",
+      "query": "Hearing aid",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {},
+      "gold": "insufficient",
+      "tags": [
+        "missing_evidence",
+        "no_definitive_answer"
+      ],
+      "pred": "insufficient",
+      "decisive": [],
+      "explanation": "No retrieved clause establishes coverage or exclusion for this item. The documents provided do not answer this; it is not assumed covered or excluded.",
+      "top3": {
+        "bm25:raw": [],
+        "bm25:normalized": [],
+        "semantic:raw": [
+          "2.10",
+          "2.5",
+          "2.6"
+        ],
+        "semantic:normalized": [
+          "2.10",
+          "2.5",
+          "2.6"
+        ],
+        "hybrid:normalized": [
+          "2.10",
+          "2.5",
+          "2.6"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.10",
+          "A1.3",
+          "4.1"
+        ]
+      }
+    },
+    {
+      "id": "q45",
+      "group": "missing3",
+      "query": "Blood bank processing charges",
+      "version": "v2",
+      "split": "dev",
+      "relevant": {},
+      "gold": "insufficient",
+      "tags": [
+        "missing_evidence",
+        "similar_but_inapplicable"
+      ],
+      "pred": "insufficient",
+      "decisive": [],
+      "explanation": "No retrieved clause establishes coverage or exclusion for this item. The documents provided do not answer this; it is not assumed covered or excluded.",
+      "top3": {
+        "bm25:raw": [
+          "1.3",
+          "4.3",
+          "2.3"
+        ],
+        "bm25:normalized": [
+          "1.3",
+          "4.3",
+          "2.3"
+        ],
+        "semantic:raw": [
+          "2.3",
+          "2.6",
+          "A1.3"
+        ],
+        "semantic:normalized": [
+          "2.3",
+          "2.6",
+          "A1.3"
+        ],
+        "hybrid:normalized": [
+          "2.3",
+          "4.3",
+          "2.8"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.3",
+          "1.3",
+          "2.8"
+        ]
+      }
+    },
+    {
+      "id": "q46",
+      "group": "missing3",
+      "query": "Medical records copying fee",
+      "version": "v2",
+      "split": "dev",
+      "relevant": {},
+      "gold": "insufficient",
+      "tags": [
+        "missing_evidence",
+        "similar_but_inapplicable"
+      ],
+      "pred": "insufficient",
+      "decisive": [],
+      "explanation": "No retrieved clause establishes coverage or exclusion for this item. The documents provided do not answer this; it is not assumed covered or excluded.",
+      "top3": {
+        "bm25:raw": [
+          "2.4",
+          "1.2",
+          "2.7"
+        ],
+        "bm25:normalized": [
+          "2.4",
+          "1.2",
+          "2.7"
+        ],
+        "semantic:raw": [
+          "2.4",
+          "2.7",
+          "2.1"
+        ],
+        "semantic:normalized": [
+          "2.4",
+          "2.7",
+          "2.1"
+        ],
+        "hybrid:normalized": [
+          "2.4",
+          "2.7",
+          "1.2"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.4",
+          "E1.3",
+          "2.7"
+        ]
+      }
+    },
+    {
+      "id": "q47",
+      "group": "cosmetic",
+      "query": "Cosmetic rhinoplasty",
+      "version": "v2",
+      "split": "dev",
+      "relevant": {
+        "POL:4.4": 2
+      },
+      "gold": "excluded",
+      "tags": [
+        "exclusion",
+        "conditional"
+      ],
+      "pred": "excluded",
+      "decisive": [
+        "4.4"
+      ],
+      "explanation": "Exclusion 4.4 applies and the claim facts state its exception is not met.",
+      "top3": {
+        "bm25:raw": [
+          "4.4"
+        ],
+        "bm25:normalized": [
+          "4.4"
+        ],
+        "semantic:raw": [
+          "4.4",
+          "2.11",
+          "3.2"
+        ],
+        "semantic:normalized": [
+          "4.4",
+          "2.11",
+          "3.2"
+        ],
+        "hybrid:normalized": [
+          "4.4",
+          "2.11",
+          "3.2"
+        ],
+        "hybrid_rerank:normalized": [
+          "4.4",
+          "2.11",
+          "2.9"
+        ]
+      }
+    },
+    {
+      "id": "q48",
+      "group": "implant",
+      "query": "Hernia mesh implant",
+      "version": "v2",
+      "split": "dev",
+      "relevant": {
+        "POL:2.11": 2
+      },
+      "gold": "conditional",
+      "tags": [
+        "conditional",
+        "similar_but_inapplicable"
+      ],
+      "pred": "conditional",
+      "decisive": [
+        "2.11"
+      ],
+      "explanation": "Payable under 2.11 only provided the implant invoice and barcode sticker are submitted with the claim; this is not established.",
+      "top3": {
+        "bm25:raw": [
+          "2.11",
+          "3.2",
+          "6.1"
+        ],
+        "bm25:normalized": [
+          "2.11",
+          "6.1",
+          "3.2"
+        ],
+        "semantic:raw": [
+          "2.11",
+          "3.2",
+          "4.4"
+        ],
+        "semantic:normalized": [
+          "2.11",
+          "3.2",
+          "4.4"
+        ],
+        "hybrid:normalized": [
+          "2.11",
+          "3.2",
+          "6.1"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.11",
+          "3.2",
+          "6.1"
+        ]
+      }
+    },
+    {
+      "id": "q49",
+      "group": "implant",
+      "query": "Coronary stent",
+      "version": "v2",
+      "split": "dev",
+      "relevant": {
+        "POL:2.11": 2
+      },
+      "gold": "conditional",
+      "tags": [
+        "conditional"
+      ],
+      "pred": "conditional",
+      "decisive": [
+        "2.11"
+      ],
+      "explanation": "Payable under 2.11 only provided the implant invoice and barcode sticker are submitted with the claim; this is not established.",
+      "top3": {
+        "bm25:raw": [
+          "2.11"
+        ],
+        "bm25:normalized": [
+          "2.11",
+          "6.1"
+        ],
+        "semantic:raw": [
+          "2.11",
+          "7.2",
+          "4.4"
+        ],
+        "semantic:normalized": [
+          "2.11",
+          "4.4",
+          "7.2"
+        ],
+        "hybrid:normalized": [
+          "2.11",
+          "6.1",
+          "4.4"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.11",
+          "6.1",
+          "2.10"
+        ]
+      }
+    },
+    {
+      "id": "q50",
+      "group": "post_hosp",
+      "query": "Follow-up consultation",
+      "version": "v2",
+      "split": "dev",
+      "relevant": {
+        "POL:2.7": 2
+      },
+      "gold": "covered",
+      "tags": [
+        "time_window"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "2.7"
+      ],
+      "explanation": "Payable under 2.7 (Pre- and Post-Hospitalisation Expenses).",
+      "top3": {
+        "bm25:raw": [
+          "2.7",
+          "2.4"
+        ],
+        "bm25:normalized": [
+          "2.7",
+          "2.4"
+        ],
+        "semantic:raw": [
+          "7.2",
+          "3.1",
+          "3.2"
+        ],
+        "semantic:normalized": [
+          "7.2",
+          "3.1",
+          "1.1"
+        ],
+        "hybrid:normalized": [
+          "2.4",
+          "2.7",
+          "7.2"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.7",
+          "2.4",
+          "1.1"
+        ]
+      }
+    },
+    {
+      "id": "q51",
+      "group": "post_hosp",
+      "query": "Follow-up consultation",
+      "version": "v2",
+      "split": "dev",
+      "relevant": {
+        "POL:2.7": 2
+      },
+      "gold": "insufficient",
+      "tags": [
+        "time_window",
+        "similar_but_inapplicable"
+      ],
+      "pred": "insufficient",
+      "decisive": [],
+      "explanation": "No retrieved clause establishes coverage or exclusion for this item. The documents provided do not answer this; it is not assumed covered or excluded.",
+      "top3": {
+        "bm25:raw": [
+          "2.7",
+          "2.4"
+        ],
+        "bm25:normalized": [
+          "2.7",
+          "2.4"
+        ],
+        "semantic:raw": [
+          "7.2",
+          "3.1",
+          "3.2"
+        ],
+        "semantic:normalized": [
+          "7.2",
+          "3.1",
+          "1.1"
+        ],
+        "hybrid:normalized": [
+          "2.4",
+          "2.7",
+          "7.2"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.7",
+          "2.4",
+          "1.1"
+        ]
+      }
+    },
+    {
+      "id": "q52",
+      "group": "doctor",
+      "query": "Doctor visit charges",
+      "version": "v2",
+      "split": "dev",
+      "relevant": {
+        "POL:2.4": 2
+      },
+      "gold": "covered",
+      "tags": [
+        "paraphrase"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "2.4"
+      ],
+      "explanation": "Payable under 2.4 (Professional Fees).",
+      "top3": {
+        "bm25:raw": [
+          "1.3",
+          "2.4",
+          "4.3"
+        ],
+        "bm25:normalized": [
+          "2.4",
+          "1.3",
+          "4.3"
+        ],
+        "semantic:raw": [
+          "2.4",
+          "2.7",
+          "2.1"
+        ],
+        "semantic:normalized": [
+          "2.4",
+          "2.1",
+          "2.7"
+        ],
+        "hybrid:normalized": [
+          "2.4",
+          "1.3",
+          "4.3"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.4",
+          "2.7",
+          "2.1"
+        ]
+      }
+    },
+    {
+      "id": "q53",
+      "group": "doctor",
+      "query": "Physician consultation in ward",
+      "version": "v2",
+      "split": "dev",
+      "relevant": {
+        "POL:2.4": 2
+      },
+      "gold": "covered",
+      "tags": [
+        "paraphrase"
+      ],
+      "pred": "covered",
+      "decisive": [
+        "2.1",
+        "E1.1"
+      ],
+      "explanation": "Payable under 2.1 (In-patient Hospitalisation Expenses), E1.1 (Revised Room Rent Limit).",
+      "top3": {
+        "bm25:raw": [
+          "2.4",
+          "2.7"
+        ],
+        "bm25:normalized": [
+          "E1.1",
+          "2.1",
+          "2.4"
+        ],
+        "semantic:raw": [
+          "2.10",
+          "2.4",
+          "1.1"
+        ],
+        "semantic:normalized": [
+          "1.1",
+          "2.10",
+          "2.6"
+        ],
+        "hybrid:normalized": [
+          "2.1",
+          "2.4",
+          "E1.1"
+        ],
+        "hybrid_rerank:normalized": [
+          "2.1",
+          "E1.1",
+          "2.7"
+        ]
+      }
+    },
+    {
+      "id": "q54",
+      "group": "rule_copay",
+      "query": "co-payment percentage applicable",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "E01:E1.2": 2
+      },
+      "gold": null,
+      "tags": [
+        "version_filter",
+        "rule_lookup"
+      ],
+      "top3": {
+        "bm25:raw": [
+          "E1.2",
+          "6.1",
+          "5.3"
+        ],
+        "bm25:normalized": [
+          "E1.2",
+          "6.1",
+          "5.3"
+        ],
+        "semantic:raw": [
+          "E1.2",
+          "5.3",
+          "1.3"
+        ],
+        "semantic:normalized": [
+          "E1.2",
+          "5.3",
+          "1.3"
+        ],
+        "hybrid:normalized": [
+          "E1.2",
+          "5.3",
+          "6.1"
+        ],
+        "hybrid_rerank:normalized": [
+          "E1.2",
+          "5.3",
+          "5.1"
+        ]
+      }
+    },
+    {
+      "id": "q55",
+      "group": "rule_copay",
+      "query": "co-payment percentage applicable",
+      "version": "v1",
+      "split": "eval",
+      "relevant": {
+        "POL:5.2": 2
+      },
+      "gold": null,
+      "tags": [
+        "version_filter",
+        "rule_lookup"
+      ],
+      "top3": {
+        "bm25:raw": [
+          "5.2",
+          "6.1",
+          "5.3"
+        ],
+        "bm25:normalized": [
+          "5.2",
+          "6.1",
+          "5.3"
+        ],
+        "semantic:raw": [
+          "5.2",
+          "5.3",
+          "1.3"
+        ],
+        "semantic:normalized": [
+          "5.2",
+          "5.3",
+          "1.3"
+        ],
+        "hybrid:normalized": [
+          "5.2",
+          "5.3",
+          "6.1"
+        ],
+        "hybrid_rerank:normalized": [
+          "5.2",
+          "5.3",
+          "5.1"
+        ]
+      }
+    },
+    {
+      "id": "q56",
+      "group": "rule_ded",
+      "query": "annual deductible amount",
+      "version": "v2",
+      "split": "dev",
+      "relevant": {
+        "POL:5.1": 2
+      },
+      "gold": null,
+      "tags": [
+        "rule_lookup",
+        "paraphrase"
+      ],
+      "top3": {
+        "bm25:raw": [
+          "5.1",
+          "E1.2",
+          "5.3"
+        ],
+        "bm25:normalized": [
+          "5.1",
+          "E1.2",
+          "5.3"
+        ],
+        "semantic:raw": [
+          "5.1",
+          "5.3",
+          "E1.2"
+        ],
+        "semantic:normalized": [
+          "5.1",
+          "5.3",
+          "E1.2"
+        ],
+        "hybrid:normalized": [
+          "5.1",
+          "E1.2",
+          "5.3"
+        ],
+        "hybrid_rerank:normalized": [
+          "5.1",
+          "5.3",
+          "E1.2"
+        ]
+      }
+    },
+    {
+      "id": "q57",
+      "group": "rule_wait",
+      "query": "waiting period for hernia surgery",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "POL:3.2": 2
+      },
+      "gold": null,
+      "tags": [
+        "rule_lookup"
+      ],
+      "top3": {
+        "bm25:raw": [
+          "3.2",
+          "2.9",
+          "3.1"
+        ],
+        "bm25:normalized": [
+          "2.9",
+          "3.2",
+          "3.1"
+        ],
+        "semantic:raw": [
+          "3.2",
+          "2.7",
+          "3.1"
+        ],
+        "semantic:normalized": [
+          "3.2",
+          "2.7",
+          "3.1"
+        ],
+        "hybrid:normalized": [
+          "3.2",
+          "3.1",
+          "1.1"
+        ],
+        "hybrid_rerank:normalized": [
+          "3.2",
+          "3.1",
+          "2.7"
+        ]
+      }
+    },
+    {
+      "id": "q58",
+      "group": "rule_room",
+      "query": "maximum room rent per day",
+      "version": "v2",
+      "split": "dev",
+      "relevant": {
+        "E01:E1.1": 2
+      },
+      "gold": null,
+      "tags": [
+        "rule_lookup",
+        "version_filter"
+      ],
+      "top3": {
+        "bm25:raw": [
+          "E1.1",
+          "2.7",
+          "2.3"
+        ],
+        "bm25:normalized": [
+          "E1.1",
+          "2.1",
+          "2.7"
+        ],
+        "semantic:raw": [
+          "E1.1",
+          "2.3",
+          "4.3"
+        ],
+        "semantic:normalized": [
+          "E1.1",
+          "2.3",
+          "2.1"
+        ],
+        "hybrid:normalized": [
+          "E1.1",
+          "2.1",
+          "2.3"
+        ],
+        "hybrid_rerank:normalized": [
+          "E1.1",
+          "2.3",
+          "2.1"
+        ]
+      }
+    },
+    {
+      "id": "q59",
+      "group": "rule_order",
+      "query": "sequence in which deductible and co-pay are applied",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "POL:5.3": 2
+      },
+      "gold": null,
+      "tags": [
+        "rule_lookup",
+        "paraphrase"
+      ],
+      "top3": {
+        "bm25:raw": [
+          "5.3",
+          "5.1",
+          "E1.2"
+        ],
+        "bm25:normalized": [
+          "5.3",
+          "5.1",
+          "E1.2"
+        ],
+        "semantic:raw": [
+          "5.3",
+          "E1.2",
+          "5.1"
+        ],
+        "semantic:normalized": [
+          "5.3",
+          "E1.2",
+          "5.1"
+        ],
+        "hybrid:normalized": [
+          "5.3",
+          "E1.2",
+          "5.1"
+        ],
+        "hybrid_rerank:normalized": [
+          "5.3",
+          "E1.2",
+          "5.1"
+        ]
+      }
+    },
+    {
+      "id": "q60",
+      "group": "rule_preexisting",
+      "query": "cover for diseases existing before the policy",
+      "version": "v2",
+      "split": "eval",
+      "relevant": {
+        "POL:3.3": 2
+      },
+      "gold": null,
+      "tags": [
+        "rule_lookup",
+        "paraphrase"
+      ],
+      "top3": {
+        "bm25:raw": [
+          "3.3",
+          "E1.3",
+          "3.2"
+        ],
+        "bm25:normalized": [
+          "3.3",
+          "E1.3",
+          "3.2"
+        ],
+        "semantic:raw": [
+          "3.3",
+          "3.1",
+          "E1.3"
+        ],
+        "semantic:normalized": [
+          "3.3",
+          "3.1",
+          "E1.3"
+        ],
+        "hybrid:normalized": [
+          "3.3",
+          "E1.3",
+          "3.1"
+        ],
+        "hybrid_rerank:normalized": [
+          "3.3",
+          "3.1",
+          "E1.3"
+        ]
+      }
+    }
+  ],
+  "limitations": [
+    "Small synthetic dataset (one demo policy, one endorsement); results do not generalise to real policy wordings.",
+    "Queries, labels and the normalisation lexicon were written by the same team, so the 'normalized' query form may be optimistic even on the held-out split; the 'raw' rows show performance without the lexicon.",
+    "The dev split was used for inspection while building the pipeline; no parameters were tuned on the eval split. One dev-split error was fixed during development: 'Blood bank processing charges' was wrongly verified as covered under 2.5 because the bare word 'blood' mapped to the laboratory category; the keyword was narrowed.",
+    "Verification metrics depend on deterministic, pattern-based clause interpretation tuned to clearly drafted wordings."
+  ]
+}

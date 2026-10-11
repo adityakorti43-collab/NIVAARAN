@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Nivaaran</string>
+    <string name="title_activity_main">Nivaaran</string>
+    <string name="package_name">in.nivaaran.app</string>
+    <string name="custom_url_scheme">in.nivaaran.app</string>
+</resources>
