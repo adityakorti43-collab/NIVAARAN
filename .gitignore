@@ -22,3 +22,4 @@ frontend/icons/
 backend/.ruff_cache/
 frontend/tsconfig.tsbuildinfo
 presentation-screenshots/
+!frontend/public/download/Nivaaran.apk
