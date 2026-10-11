@@ -21,3 +21,4 @@ extracted/
 frontend/icons/
 backend/.ruff_cache/
 frontend/tsconfig.tsbuildinfo
+presentation-screenshots/

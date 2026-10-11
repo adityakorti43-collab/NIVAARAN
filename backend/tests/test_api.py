@@ -172,3 +172,10 @@ def test_cost_estimate_is_labelled_hypothetical(client, demo):
 def test_invalid_claim_input(client, demo):
     r = client.post("/api/claims", json={"policy_document_id": demo["policy_id"], "admission_date": "2025-12-01"})
     assert r.status_code == 400
+
+
+def test_assistant_lists_the_charges_that_are_not_covered(client, demo):
+    r = client.post(f"/api/claims/{demo['claim_id']}/ask", json={"question": "Which charges are not covered, and why?"}).json()
+    assert r["grounded"] and "not covered" in r["answer"].lower() and "Not covered:" in r["answer"]
+    assert any(w in r["answer"] for w in ("Television", "Admission kit", "TV"))       # excluded comfort items on the sample bill
+    assert r["citations"]

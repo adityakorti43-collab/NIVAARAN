@@ -288,6 +288,34 @@ def _route(q: str, low: str, claim: Claim, analysis: AnalysisResult, docs: dict[
                 "answer": ("The following information is missing or unresolved: " + " ".join(lines)) if lines else
                 "No missing information was identified for the current claim."}
 
+    # "Which charges are not covered (and why)?": across the whole bill, not one item.
+    if (re.search(r"\b(not|n't|never)\s+(be\s+)?(covered|paid|payable)|\bexclu\w*|\brejected\b|\bcut\b|\bdeducted\b", low)
+            and re.search(r"\b(which|what|list|all|charges|items|lines|things|bill)\b", low) and not _match_item(q, analysis)):
+        clauses = {c.clause_id: c for c in _clauses(analysis, docs)}
+        def where(r):
+            return ", ".join(c.split(":")[1] for c in r.supporting_clause_ids) or "no clause"
+        excl = [r for r in analysis.rows if r.status == "potentially_excluded"]
+        part = [r for r in analysis.rows if r.status == "partially_payable" and r.eligible_amount is not None]
+        open_ = [r for r in analysis.rows if r.manual_review or r.status in ("conditional", "insufficient_evidence", "conflicting_evidence")]
+        parts = []
+        if excl:
+            parts.append("Not covered: " + " ".join(f"• Line {r.line_no} '{r.original_description}' ({fmt(r.claimed_amount)}), clause {where(r)}: "
+                                                    f"{r.explanation}" for r in excl))
+        if part:
+            parts.append("Paid only in part: " + " ".join(f"• Line {r.line_no} '{r.original_description}': {fmt(r.claimed_amount)} billed, "
+                                                         f"{fmt(r.eligible_amount)} eligible (clause {where(r)})." for r in part))
+        if open_:
+            parts.append("Not decided yet (needs a paper or a check): " + "; ".join(f"line {r.line_no} '{r.original_description}'" for r in open_) + ".")
+        lost = sum(r.claimed_amount for r in excl)
+        lead = (f"{len(excl)} charge(s) totalling {fmt(lost)} are not covered under '{v.selected.label if v.selected else 'the policy'}'. "
+                if excl else "No charge on this bill is fully excluded. ")
+        cites = []
+        for r in excl + part:
+            for cid in r.supporting_clause_ids:
+                if cid in clauses and cid not in [x["clause_id"] for x in cites]:
+                    cites.append(_cite(clauses[cid]))
+        return {"kind": "coverage_summary", "grounded": True, "answer": lead + "\n\n" + "\n\n".join(parts), "citations": cites[:6]}
+
     row = _match_item(q, analysis)
     if row and re.search(r"why|reduc|exclud|cover|claus|appl|payable|status|deduct", low):
         ev = [e for e in row.evidence if e.clause_id in row.supporting_clause_ids]
