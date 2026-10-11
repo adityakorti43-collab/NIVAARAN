@@ -20,3 +20,4 @@ extracted/
 *.aab
 frontend/icons/
 backend/.ruff_cache/
+frontend/tsconfig.tsbuildinfo
